@@ -4,42 +4,45 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.sql.Timestamp;
 import java.util.UUID;
 
+@Entity
+@Table(name = "wallet")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@Entity
-@Table(name = "user_token")
 @ToString
-public class UserTokenEntity {
+public class WalletEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private UUID id;
 
-    @NotBlank
-    private String token;
+    @Max(message = "Max balance allowed is 10000000", value = 10000000)
+    @Min(message = "Negative Balance not allowed", value = 0)
+    @Column(nullable = false)
+    private Integer balance;
 
-    @NotBlank
-    private String type;
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "id")
     @Fetch(FetchMode.JOIN)
     private AppUserEntity appUserEntity;
 
-    @NotNull
-    private Timestamp expirationTime;
+
+    @Column(nullable = false)
+    private boolean isActivated;
 
     @CreationTimestamp
     private Timestamp creationTimestamp;
 
+    @UpdateTimestamp
+    private Timestamp updateTimestamp;
 
 }
