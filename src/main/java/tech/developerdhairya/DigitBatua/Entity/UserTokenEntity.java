@@ -31,7 +31,7 @@ public class UserTokenEntity {
     private String type;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(name = "app_user", nullable = false)
     @Fetch(FetchMode.JOIN)
     private AppUserEntity appUserEntity;
 
