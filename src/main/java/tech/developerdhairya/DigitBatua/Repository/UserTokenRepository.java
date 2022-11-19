@@ -1,9 +1,11 @@
 package tech.developerdhairya.DigitBatua.Repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import tech.developerdhairya.DigitBatua.Entity.UserTokenEntity;
+import org.springframework.stereotype.Repository;
+import tech.developerdhairya.DigitBatua.Entity.UserToken;
 
 import java.util.UUID;
 
-public interface UserTokenRepository extends JpaRepository<UserTokenEntity, UUID> {
+@Repository
+public interface UserTokenRepository extends JpaRepository<UserToken, UUID> {
 }

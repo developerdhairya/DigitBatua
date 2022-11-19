@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 
@@ -16,12 +17,11 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "AppUser")
 @ToString
-public class AppUserEntity {
+public class AppUser {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private UUID userId;
 
     @NotBlank
     @Length(message = "Length of firstName should be b/w 2-50", min = 2, max = 50)
@@ -34,7 +34,7 @@ public class AppUserEntity {
     private String lastName;
 
     @Column(nullable = false, unique = true)
-    @Email(message = "Invalid emailId", regexp = "[A-Z0-9+_.-]+@[A-Z0-9.-]+$")
+    @Email(message = "Invalid emailId")
     private String emailId;
 
     @Column(nullable = false, unique = true, length = 10)
@@ -51,7 +51,7 @@ public class AppUserEntity {
     private boolean isVerified=true;
 
     @CreationTimestamp
-    private Timestamp creationTimestamp;
+    private Timestamp creationTimestamp=Timestamp.valueOf(LocalDateTime.now());
 
     @UpdateTimestamp
     private Timestamp updateTimestamp;

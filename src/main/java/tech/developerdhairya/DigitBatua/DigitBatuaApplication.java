@@ -9,5 +9,5 @@ public class DigitBatuaApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(DigitBatuaApplication.class, args);
 	}
-
+//add redis
 }

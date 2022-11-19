@@ -1,9 +1,11 @@
 package tech.developerdhairya.DigitBatua.Repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import tech.developerdhairya.DigitBatua.Entity.WalletEntity;
+import org.springframework.stereotype.Repository;
+import tech.developerdhairya.DigitBatua.Entity.Wallet;
 
 import java.util.UUID;
 
-public interface WalletRepository extends JpaRepository<WalletEntity, UUID> {
+@Repository
+public interface WalletRepository extends JpaRepository<Wallet, UUID> {
 }

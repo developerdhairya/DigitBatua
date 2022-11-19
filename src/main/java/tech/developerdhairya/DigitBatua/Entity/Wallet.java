@@ -2,8 +2,6 @@ package tech.developerdhairya.DigitBatua.Entity;
 
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
@@ -13,27 +11,24 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 @Entity
-//@Table(name = "wallet")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @ToString
-public class WalletEntity {
+public class Wallet {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private UUID walletId;
+
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private AppUser appUser;
 
     @Max(message = "Max balance allowed is 10000000", value = 10000000)
     @Min(message = "Negative Balance not allowed", value = 0)
     @Column(nullable = false)
     private Integer balance;
-
-//    @ManyToOne
-//    @JoinColumn(name = "user_id")
-//    @Fetch(FetchMode.JOIN)
-//    private AppUserEntity appUserEntity;
-
 
     @Column(nullable = false)
     private boolean isActivated;

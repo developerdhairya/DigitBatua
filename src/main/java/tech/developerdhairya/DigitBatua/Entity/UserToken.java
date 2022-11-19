@@ -2,8 +2,6 @@ package tech.developerdhairya.DigitBatua.Entity;
 
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -16,12 +14,11 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-//@Table(name = "user_token")
 @ToString
-public class UserTokenEntity {
+public class UserToken {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private UUID userTokenId;
 
     @NotBlank
     private String token;
@@ -29,9 +26,9 @@ public class UserTokenEntity {
     @NotBlank
     private String type;
 
-//    @ManyToOne(optional = false)
-//    @JoinColumn(name = "user_id", nullable = false, foreignKey = "")
-//    private AppUserEntity appUserEntity;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private AppUser appUserEntity;
 
     @NotNull
     private Timestamp expirationTime;
