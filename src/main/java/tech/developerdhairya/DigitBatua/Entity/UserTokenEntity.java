@@ -16,12 +16,11 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "user_token")
+//@Table(name = "user_token")
 @ToString
 public class UserTokenEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
     private UUID id;
 
     @NotBlank
@@ -30,10 +29,9 @@ public class UserTokenEntity {
     @NotBlank
     private String type;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "app_user", nullable = false)
-    @Fetch(FetchMode.JOIN)
-    private AppUserEntity appUserEntity;
+//    @ManyToOne(optional = false)
+//    @JoinColumn(name = "user_id", nullable = false, foreignKey = "")
+//    private AppUserEntity appUserEntity;
 
     @NotNull
     private Timestamp expirationTime;

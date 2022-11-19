@@ -1,13 +1,12 @@
 package tech.developerdhairya.DigitBatua.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.Length;
-
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.*;
 import java.sql.Timestamp;
 import java.util.UUID;
 
@@ -17,12 +16,11 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "app_user")
+@Table(name = "AppUser")
 @ToString
 public class AppUserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
     private UUID id;
 
     @NotBlank
@@ -35,18 +33,22 @@ public class AppUserEntity {
     @Column(nullable = false)
     private String lastName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     @Email(message = "Invalid emailId", regexp = "[A-Z0-9+_.-]+@[A-Z0-9.-]+$")
     private String emailId;
 
+    @Column(nullable = false, unique = true, length = 10)
+    private String mobileNumber;
+
     @Column(nullable = false)
+    @JsonIgnore
     private String hashedPassword;
 
     @Column(nullable = false)
-    private String role;
+    private String role="user";
 
     @Column(nullable = false)
-    private boolean isVerified;
+    private boolean isVerified=true;
 
     @CreationTimestamp
     private Timestamp creationTimestamp;

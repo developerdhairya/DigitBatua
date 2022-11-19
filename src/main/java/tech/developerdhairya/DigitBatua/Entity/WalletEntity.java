@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 @Entity
-@Table(name = "wallet")
+//@Table(name = "wallet")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -22,7 +22,6 @@ import java.util.UUID;
 public class WalletEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
     private UUID id;
 
     @Max(message = "Max balance allowed is 10000000", value = 10000000)
@@ -30,10 +29,10 @@ public class WalletEntity {
     @Column(nullable = false)
     private Integer balance;
 
-    @ManyToOne
-    @JoinColumn(name = "app_user")
-    @Fetch(FetchMode.JOIN)
-    private AppUserEntity appUserEntity;
+//    @ManyToOne
+//    @JoinColumn(name = "user_id")
+//    @Fetch(FetchMode.JOIN)
+//    private AppUserEntity appUserEntity;
 
 
     @Column(nullable = false)
