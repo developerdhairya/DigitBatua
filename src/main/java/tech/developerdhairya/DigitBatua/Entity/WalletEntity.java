@@ -31,7 +31,7 @@ public class WalletEntity {
     private Integer balance;
 
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "app_user")
     @Fetch(FetchMode.JOIN)
     private AppUserEntity appUserEntity;
 
