@@ -28,7 +28,7 @@ public class UserToken {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false)
-    private AppUser appUserEntity;
+    private AppUser appUser;
 
     @NotNull
     private Timestamp expirationTime;

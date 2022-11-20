@@ -32,7 +32,7 @@ public class Transaction {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "to_wallet_id", nullable = false)
-    private AppUser p2;
+    private Wallet p2;
 
     @Min(message = "Minimum Transaction amount should be Rs.1", value = 1)
     @Column(nullable = false)
