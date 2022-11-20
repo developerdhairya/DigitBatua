@@ -10,6 +10,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import tech.developerdhairya.DigitBatua.DTO.RegisterUserDTO;
 import tech.developerdhairya.DigitBatua.DTO.ResponseHandler;
 import tech.developerdhairya.DigitBatua.Entity.AppUser;
+import tech.developerdhairya.DigitBatua.Entity.Token;
 import tech.developerdhairya.DigitBatua.Entity.UserToken;
 import tech.developerdhairya.DigitBatua.Service.AppUserService;
 import tech.developerdhairya.DigitBatua.Service.MailerService;
@@ -46,8 +47,8 @@ public class AppUserController {
     }
 
     @GetMapping("/register")
-    public String reg(){
-        return "l";
+    public int reg(String email){
+        return userTokenService.getTokenByUser(email, Token.verification);
     }
 
 }

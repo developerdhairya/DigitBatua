@@ -26,6 +26,10 @@ public class AppUserService {
         return userRepository.save(entity);
     }
 
+    public void verifyUser(String emailId){
+
+    }
+
 
 
 }
