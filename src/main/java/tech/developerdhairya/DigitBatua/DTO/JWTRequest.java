@@ -5,13 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data @NoArgsConstructor @AllArgsConstructor
-public class RegisterUserDTO {
+public class JWTRequest {
 
-    private String firstName;
-    private String lastName;
-    private String emailId;
+    private String username;
     private String password;
-    private String confirmPassword;
-    private String mobileNumber;
 
 }

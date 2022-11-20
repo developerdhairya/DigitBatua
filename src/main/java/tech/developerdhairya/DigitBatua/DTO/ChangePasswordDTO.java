@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChangePasswordDTO {
 
-    private String email;
+    private String emailId;
     private String currentPassword;
     private String confirmCurrentPassword;
 

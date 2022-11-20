@@ -1,4 +1,4 @@
-package Util;
+package tech.developerdhairya.DigitBatua.Util;
 
 import org.springframework.stereotype.Component;
 import tech.developerdhairya.DigitBatua.Entity.VerificationToken;

@@ -1,7 +1,7 @@
 package tech.developerdhairya.DigitBatua.Entity;
 
 
-import Util.AuthenticationUtil;
+import tech.developerdhairya.DigitBatua.Util.AuthenticationUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;

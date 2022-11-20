@@ -9,7 +9,7 @@ import java.util.UUID;
 @Repository
 public interface AppUserRepository extends JpaRepository<AppUser, UUID> {
 
-
+    AppUser findByEmailId(String email);
 
 
 }
