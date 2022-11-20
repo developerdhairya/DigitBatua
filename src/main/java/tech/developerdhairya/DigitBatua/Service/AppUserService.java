@@ -23,11 +23,9 @@ public class AppUserService {
         entity.setHashedPassword("fgygdf6h65urtfutdjud");
         entity.setMobileNumber(DTO.getMobileNumber());
         entity.setUpdateTimestamp(Timestamp.valueOf(LocalDateTime.now()));
-        System.out.println(entity.toString());
-
-        AppUser response=userRepository.save(entity);
-        return response;
+        return userRepository.save(entity);
     }
+
 
 
 }

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpServerErrorException;
 import tech.developerdhairya.DigitBatua.DTO.RegisterUserDTO;
@@ -28,7 +29,7 @@ public class AppUserController {
     @Autowired
     private MailerService mailerService;
 
-    @PostMapping("/register")
+    @PostMapping("/register") @Transactional
     public ResponseEntity<Object> register(@RequestBody RegisterUserDTO userDTO){
         try{
             AppUser data=appUserService.register(userDTO);

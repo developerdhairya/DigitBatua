@@ -3,6 +3,7 @@ package tech.developerdhairya.DigitBatua.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tech.developerdhairya.DigitBatua.Entity.AppUser;
+import tech.developerdhairya.DigitBatua.Entity.Token;
 import tech.developerdhairya.DigitBatua.Entity.UserToken;
 import tech.developerdhairya.DigitBatua.Repository.UserTokenRepository;
 
@@ -19,7 +20,7 @@ public class UserTokenService {
     public UserToken generateVerificationToken(AppUser appUser){
         UserToken token=new UserToken();
         token.setAppUser(appUser);
-        token.setType("verification");
+        token.setType(Token.verification.toString());
         token.setToken(UUID.randomUUID().toString());
         token.setExpirationTime(new Timestamp(System.currentTimeMillis()+600000));
         UserToken response=userTokenRepository.save(token);

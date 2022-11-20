@@ -42,7 +42,7 @@ public class AppUser {
 
     @Column(nullable = false)
     @JsonIgnore
-    private String hashedPassword;
+    private String hashedPassword;          //not visible in json response
 
     @Column(nullable = false)
     private String role="user";
