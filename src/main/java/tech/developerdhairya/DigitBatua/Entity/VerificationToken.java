@@ -1,6 +1,7 @@
 package tech.developerdhairya.DigitBatua.Entity;
 
 
+import Util.AuthenticationUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
@@ -13,9 +14,9 @@ public class VerificationToken{
 
     private static final int EXPIRATION_TIME=10;
 
-    public VerificationToken(String token, UserEntity userEntity) {
+    public VerificationToken(String token, AppUser appUser) {
         this.token = token;
-        this.userEntity = userEntity;
+        this.appUser = appUser;
         this.expirationTime=util.calculateExpirationTime(EXPIRATION_TIME);
     }
 
