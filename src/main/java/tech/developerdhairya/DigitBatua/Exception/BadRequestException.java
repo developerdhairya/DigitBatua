@@ -1,7 +1,7 @@
 package tech.developerdhairya.DigitBatua.Exception;
 
 public class BadRequestException extends Exception{
-    public BadRequestException() {
-        super("Invalid Token");
+    public BadRequestException(String message) {
+        super(message);
     }
 }
