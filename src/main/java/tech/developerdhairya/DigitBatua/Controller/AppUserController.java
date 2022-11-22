@@ -22,12 +22,11 @@ import javax.servlet.http.HttpServletRequest;
 
 
 @RestController
-@RequestMapping("/api/user")
+//@RequestMapping("/user")
 public class AppUserController {
 
     @Autowired
     private AppUserService appUserService;
-
 
     @Autowired
     private AuthenticationUtil util;
@@ -42,9 +41,11 @@ public class AppUserController {
     private UserDetailsServiceImpl userDetailsServiceImpl;
 
     @PostMapping("/register")
-    public ResponseEntity<Object> registerUser(@RequestBody RegisterUserDTO registerUserDTO, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<Object> registerUser(@RequestBody RegisterUserDTO registerUserDTO) {
         try {
+            System.out.println(1);
             AppUser appUser = appUserService.registerUser(registerUserDTO);
+            System.out.println(appUser);
             return ResponseHandler.generateSuccessResponse(appUser, HttpStatus.CREATED);
         } catch (Exception e) {
             e.printStackTrace(System.out);
