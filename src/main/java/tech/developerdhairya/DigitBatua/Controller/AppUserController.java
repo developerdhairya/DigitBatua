@@ -1,22 +1,23 @@
 package tech.developerdhairya.DigitBatua.Controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import tech.developerdhairya.DigitBatua.DTO.ChangePasswordDTO;
-import tech.developerdhairya.DigitBatua.DTO.JWTRequest;
-import tech.developerdhairya.DigitBatua.DTO.JWTResponse;
-import tech.developerdhairya.DigitBatua.DTO.RegisterUserDTO;
+import tech.developerdhairya.DigitBatua.DTO.*;
 import tech.developerdhairya.DigitBatua.Entity.AppUser;
+import tech.developerdhairya.DigitBatua.Exception.BadRequestException;
+import tech.developerdhairya.DigitBatua.Exception.NotAcceptableException;
+import tech.developerdhairya.DigitBatua.Exception.UnauthorizedException;
 import tech.developerdhairya.DigitBatua.Util.AuthenticationUtil;
 import tech.developerdhairya.DigitBatua.Util.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 import tech.developerdhairya.DigitBatua.Service.AppUserService;
 import tech.developerdhairya.DigitBatua.Service.UserDetailsServiceImpl;
-
 import javax.servlet.http.HttpServletRequest;
 
 
@@ -41,56 +42,74 @@ public class AppUserController {
     private UserDetailsServiceImpl userDetailsServiceImpl;
 
     @PostMapping("/register")
-    public boolean registerUser(@RequestBody RegisterUserDTO registerUserDTO, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<Object> registerUser(@RequestBody RegisterUserDTO registerUserDTO, HttpServletRequest httpServletRequest) {
         try {
-            AppUser user = appUserService.registerUser(registerUserDTO);
-            return true;
+            AppUser appUser = appUserService.registerUser(registerUserDTO);
+            return ResponseHandler.generateSuccessResponse(appUser, HttpStatus.CREATED);
         } catch (Exception e) {
             e.printStackTrace(System.out);
-            return false;
+            return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,"");
         }
 
     }
 
     @GetMapping("/verifyRegistration")
-    public String verifyRegistration(@RequestParam("token") String token) {
-        return appUserService.validateVerificationToken(token);
+    public ResponseEntity<Object> verifyRegistration(@RequestParam("token") String token) {
+        try{
+            appUserService.validateVerificationToken(token);
+            return ResponseHandler.generateSuccessResponse(null,HttpStatus.ACCEPTED);
+        } catch (BadRequestException e) {
+            e.printStackTrace(); //log error
+            return ResponseHandler.generateErrorResponse(HttpStatus.BAD_REQUEST,e.getLocalizedMessage());
+        } catch (UnauthorizedException e) {
+            return ResponseHandler.generateErrorResponse(HttpStatus.UNAUTHORIZED,e.getLocalizedMessage());
+        }catch (Exception e){
+            return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,"Something went wrong!");
+        }
     }
 
     @GetMapping("/resendVerificationToken")
-    public String resendVerificationToken(@RequestParam("email") String email) {
-        return appUserService.resendVerificationToken(email);
+    public ResponseEntity<Object> resendVerificationToken() {
+        String email= SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        try {
+            appUserService.resendVerificationToken(email);
+            return ResponseHandler.generateSuccessResponse(null,HttpStatus.ACCEPTED);
+        } catch (NotAcceptableException e) {
+            return ResponseHandler.generateErrorResponse(HttpStatus.NOT_ACCEPTABLE,e.getLocalizedMessage());
+        }catch (Exception e){
+            return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,"Something went wrong!");
+        }
     }
 
     @PostMapping("/resetPassword")
-    public String resetPassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
-        return appUserService.resetPassword(changePasswordDTO);
+    public ResponseEntity<Object> resetPassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+        try {
+            appUserService.resetPassword(changePasswordDTO);
+            return ResponseHandler.generateSuccessResponse(null,HttpStatus.OK);
+        } catch (UnauthorizedException e) {
+            return ResponseHandler.generateErrorResponse(HttpStatus.UNAUTHORIZED,e.getLocalizedMessage());
+        }catch (Exception e){
+            return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,"Something went wrong!");
+        }
     }
 
     @PostMapping("/authenticate")
-    public JWTResponse authenticate(@RequestBody JWTRequest jwtRequest) throws Exception {
+    public ResponseEntity<Object> authenticate(@RequestBody JWTRequest jwtRequest) throws Exception {
         try {
-
-            System.out.println(jwtRequest.getUsername()+jwtRequest.getPassword());
-
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     jwtRequest.getUsername(),
                     jwtRequest.getPassword()
             );
             authenticationManager.authenticate(authenticationToken);
+            UserDetails userDetails
+                    = userDetailsServiceImpl.loadUserByUsername(jwtRequest.getUsername());
+            String token =
+                    jwtUtil.generateToken(userDetails);
+            return ResponseHandler.generateSuccessResponse(new JWTResponse(token),HttpStatus.OK);
         } catch (BadCredentialsException e) {
-            System.out.println("Invalid credentials"+e);
             throw new Exception("Invalid Credentials", e);
+        }catch (Exception e){
+            return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,"Something went wrong!");
         }
-
-        final UserDetails userDetails
-                = userDetailsServiceImpl.loadUserByUsername(jwtRequest.getUsername());
-
-        final String token =
-                jwtUtil.generateToken(userDetails);
-
-        System.out.println("moo");
-        return new JWTResponse(token);
-
     }
 }
