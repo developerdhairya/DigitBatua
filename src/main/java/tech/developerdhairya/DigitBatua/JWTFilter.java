@@ -1,5 +1,6 @@
 package tech.developerdhairya.DigitBatua;
 
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import tech.developerdhairya.DigitBatua.Util.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,8 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 
-//Standard boilerplate code.
-
 @Component
 public class JWTFilter extends OncePerRequestFilter {
 
@@ -28,11 +27,8 @@ public class JWTFilter extends OncePerRequestFilter {
     @Autowired
     JWTUtil jwtUtil;
 
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
-
         SecurityContext context= SecurityContextHolder.getContext();
         String authHeader=request.getHeader("Authorization");
         String jwt=null;
@@ -46,15 +42,13 @@ public class JWTFilter extends OncePerRequestFilter {
         if(context.getAuthentication()==null && username!=null){
             UserDetails userDetails= userDetailsServiceImpl.loadUserByUsername(username);
             if(jwtUtil.validateToken(jwt,userDetails)){
-                //Create and set username password authentication token
-                UsernamePasswordAuthenticationToken authenticationToken=new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                context.setAuthentication(authenticationToken);
+                UsernamePasswordAuthenticationToken authToken=new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
+                //Converting HTTPServlet(Java Class) to WebAuthenticationDetails (internal spring class)
+                WebAuthenticationDetails details=new WebAuthenticationDetailsSource().buildDetails(request);
+                authToken.setDetails(details);
+                context.setAuthentication(authToken);
             }
-            filterChain.doFilter(request,response);
+            filterChain.doFilter(request,response);  // same as next() node.js
         }
-
-
-
     }
 }
