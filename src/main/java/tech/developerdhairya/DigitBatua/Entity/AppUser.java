@@ -48,7 +48,7 @@ public class AppUser {
     private String role="user";
 
     @Column(nullable = false)
-    private boolean isVerified=true;
+    private boolean isVerified=false;
 
     @CreationTimestamp
     private Timestamp creationTimestamp=Timestamp.valueOf(LocalDateTime.now());
