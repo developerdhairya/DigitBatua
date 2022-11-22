@@ -1,11 +1,13 @@
 package tech.developerdhairya.DigitBatua.Controller;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import tech.developerdhairya.DigitBatua.DTO.*;
 import tech.developerdhairya.DigitBatua.Entity.AppUser;
 import tech.developerdhairya.DigitBatua.Exception.BadRequestException;
@@ -22,7 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 
 
 @RestController
-//@RequestMapping("/user")
 public class AppUserController {
 
     @Autowired
@@ -43,15 +44,13 @@ public class AppUserController {
     @PostMapping("/register")
     public ResponseEntity<Object> registerUser(@RequestBody RegisterUserDTO registerUserDTO) {
         try {
-            System.out.println(1);
             AppUser appUser = appUserService.registerUser(registerUserDTO);
-            System.out.println(appUser);
             return ResponseHandler.generateSuccessResponse(appUser, HttpStatus.CREATED);
-        } catch (Exception e) {
-            e.printStackTrace(System.out);
-            return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,"");
+        }catch (DataIntegrityViolationException e){
+            return ResponseHandler.generateErrorResponse(HttpStatus.CONFLICT,e.getMostSpecificCause().getMessage());
+        }catch (Exception e) {
+            return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,"Something went wrong!");
         }
-
     }
 
     @GetMapping("/verifyRegistration")
@@ -95,20 +94,23 @@ public class AppUserController {
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<Object> authenticate(@RequestBody JWTRequest jwtRequest) throws Exception {
+    public ResponseEntity<Object> authenticate(@RequestBody JWTRequest jwtRequest) throws UnauthorizedException,Exception {
         try {
+            System.out.println(20);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    jwtRequest.getUsername(),
+                    jwtRequest.getEmailId(),
                     jwtRequest.getPassword()
             );
             authenticationManager.authenticate(authenticationToken);
             UserDetails userDetails
-                    = userDetailsServiceImpl.loadUserByUsername(jwtRequest.getUsername());
+                    = userDetailsServiceImpl.loadUserByUsername(jwtRequest.getEmailId());
             String token =
                     jwtUtil.generateToken(userDetails);
             return ResponseHandler.generateSuccessResponse(new JWTResponse(token),HttpStatus.OK);
         } catch (BadCredentialsException e) {
-            throw new Exception("Invalid Credentials", e);
+            return ResponseHandler.generateErrorResponse(HttpStatus.UNAUTHORIZED,e.getLocalizedMessage());
+        }catch (UsernameNotFoundException e){
+            return ResponseHandler.generateErrorResponse(HttpStatus.NOT_FOUND,e.getLocalizedMessage());
         }catch (Exception e){
             return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,"Something went wrong!");
         }
