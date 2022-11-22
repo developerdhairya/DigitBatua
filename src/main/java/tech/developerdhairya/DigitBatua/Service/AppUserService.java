@@ -1,12 +1,17 @@
 package tech.developerdhairya.DigitBatua.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import tech.developerdhairya.DigitBatua.DTO.ChangePasswordDTO;
 import tech.developerdhairya.DigitBatua.DTO.RegisterUserDTO;
 import tech.developerdhairya.DigitBatua.Entity.AppUser;
 import tech.developerdhairya.DigitBatua.Entity.VerificationToken;
+import tech.developerdhairya.DigitBatua.Exception.BadRequestException;
+import tech.developerdhairya.DigitBatua.Exception.NotAcceptableException;
+import tech.developerdhairya.DigitBatua.Exception.NotFoundException;
+import tech.developerdhairya.DigitBatua.Exception.UnauthorizedException;
 import tech.developerdhairya.DigitBatua.Repository.AppUserRepository;
 import tech.developerdhairya.DigitBatua.Repository.VerificationTokenRepository;
 import tech.developerdhairya.DigitBatua.Util.AuthenticationUtil;
@@ -32,7 +37,6 @@ public class AppUserService {
     public AppUser registerUser(RegisterUserDTO registerUserDTO) {
         String password = registerUserDTO.getPassword();
         String encodedPassword = passwordEncoder.encode(password);
-
         AppUser appUser = new AppUser();
         appUser.setFirstName(registerUserDTO.getFirstName());
         appUser.setLastName(registerUserDTO.getLastName());
@@ -51,67 +55,53 @@ public class AppUserService {
     }
 
     //enable user
-    public String validateVerificationToken(String token) {
+    public void validateVerificationToken(String token) throws BadRequestException, UnauthorizedException {
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token);
         if (verificationToken == null) {
-            return "Verification token is Invalid";
+            throw new BadRequestException();
         }
 
         if (util.checkTokenExpiry(verificationToken)) {
-            return "Token is expired";
+            throw new UnauthorizedException("Token Expired");
         }
 
         AppUser appUser = verificationToken.getAppUser();
         appUser.setVerified(true);
         userRepository.save(appUser);
         verificationTokenRepository.delete(verificationToken);
-        return "User validation Successful";
-
     }
 
 
-    public String resendVerificationToken(String email) {
+    public void resendVerificationToken(String email) throws NotAcceptableException {
         AppUser appUser = userRepository.findByEmailId(email);
-        if (appUser == null) {
-            return "No user exists with the given email-address";
-        }
         if (appUser.isVerified()) {
-            return "User has already been verified";
+           throw new NotAcceptableException("User has already been verified");
         }
+        String emailBody;
         VerificationToken token = verificationTokenRepository.findByAppUser(appUser);
-
-        if (!util.checkTokenExpiry(token)) {
-            //DO mail user the same token
-            return "The token has been resent to your registered email id";
+        if (util.checkTokenExpiry(token)) {
+            verificationTokenRepository.delete(token);
+            emailBody=UUID.randomUUID().toString();
+            VerificationToken newToken = new VerificationToken(emailBody, appUser);
+            verificationTokenRepository.save(newToken);
         }
-
-        //delete expired token
-        verificationTokenRepository.delete(token);
-
-        //create new token
-        VerificationToken newToken = new VerificationToken(UUID.randomUUID().toString(), appUser);
-        verificationTokenRepository.save(newToken);
-
-        //DO mail user the newly generated token.
-
-        return "New Token has been sent to your registered email ID";
+        //DO mail user the email-body
     }
 
 
-    public String resetPassword(ChangePasswordDTO changePassword) {
+    public String resetPassword(ChangePasswordDTO changePassword) throws UnauthorizedException {
         if (!changePassword.getCurrentPassword().equals(changePassword.getConfirmCurrentPassword())) {
             return "Passwords dont match";
         }
         String currentEncodedPassword = passwordEncoder.encode(changePassword.getCurrentPassword());
-        AppUser appUser = userRepository.findByEmailId(changePassword.getEmailId());
-        if (appUser.getHashedPassword().equals(currentEncodedPassword)) {
-            String newEncodedPassword = passwordEncoder.encode(changePassword.getCurrentPassword());
-            appUser.setHashedPassword(newEncodedPassword);
-            userRepository.save(appUser);
-            return "Success";
+        String emailId= SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        AppUser appUser = userRepository.findByEmailId(emailId);
+        if (!appUser.getHashedPassword().equals(currentEncodedPassword)){
+            throw new UnauthorizedException("Current Password Is Invalid");
         }
-        return "Current Password is invalid";
-
+        String newEncodedPassword = passwordEncoder.encode(changePassword.getCurrentPassword());
+        appUser.setHashedPassword(newEncodedPassword);
+        userRepository.save(appUser);
     }
 
 
