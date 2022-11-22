@@ -18,7 +18,6 @@ import tech.developerdhairya.DigitBatua.Service.UserDetailsServiceImpl;
 @EnableWebSecurity @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-
     @Autowired
     private UserDetailsServiceImpl userDetailsServiceImpl;
 
@@ -29,7 +28,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity security) throws Exception {
         security.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/authenticate").permitAll()
+                .antMatchers(new String[]{"/register","/authenticate"}).permitAll()
                 .anyRequest().authenticated().and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
