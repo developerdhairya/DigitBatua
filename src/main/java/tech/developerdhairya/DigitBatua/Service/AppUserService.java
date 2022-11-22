@@ -1,6 +1,7 @@
 package tech.developerdhairya.DigitBatua.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,7 +39,7 @@ public class AppUserService {
     private MailerService mailerService;
 
 
-    public AppUser registerUser(RegisterUserDTO registerUserDTO) {
+    public AppUser registerUser(RegisterUserDTO registerUserDTO) throws DataIntegrityViolationException {
         String password = registerUserDTO.getPassword();
         String encodedPassword = passwordEncoder.encode(password);
         AppUser appUser = new AppUser();
