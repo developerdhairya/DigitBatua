@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+//Boilerplate code taken from docs
+
 @Component
 public class JWTUtil implements Serializable {
 
