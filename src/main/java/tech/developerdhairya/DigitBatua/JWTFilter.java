@@ -33,7 +33,7 @@ public class JWTFilter extends OncePerRequestFilter {
         String authHeader=request.getHeader("Authorization");
         String jwt=null;
         String username=null;
-
+        System.out.println(300);
         if(authHeader!=null && authHeader.startsWith("Bearer")){
             jwt=authHeader.substring(7);
             username=jwtUtil.getUsernameFromToken(jwt);
@@ -48,7 +48,7 @@ public class JWTFilter extends OncePerRequestFilter {
                 authToken.setDetails(details);
                 context.setAuthentication(authToken);
             }
-            filterChain.doFilter(request,response);  // same as next() node.js
         }
+        filterChain.doFilter(request,response);  // same as next() node.js
     }
 }
