@@ -1,6 +1,7 @@
 package tech.developerdhairya.DigitBatua.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,9 @@ public class AppUserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private MailerService mailerService;
+
 
     public AppUser registerUser(RegisterUserDTO registerUserDTO) {
         String password = registerUserDTO.getPassword();
@@ -41,6 +45,7 @@ public class AppUserService {
         appUser.setFirstName(registerUserDTO.getFirstName());
         appUser.setLastName(registerUserDTO.getLastName());
         appUser.setEmailId(registerUserDTO.getEmailId());
+        appUser.setMobileNumber(registerUserDTO.getMobileNumber());
         appUser.setRole("USER");
         appUser.setHashedPassword(encodedPassword);
         return userRepository.save(appUser);
@@ -58,13 +63,11 @@ public class AppUserService {
     public void validateVerificationToken(String token) throws BadRequestException, UnauthorizedException {
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token);
         if (verificationToken == null) {
-            throw new BadRequestException();
+            throw new BadRequestException("Verification Token Required");
         }
-
         if (util.checkTokenExpiry(verificationToken)) {
             throw new UnauthorizedException("Token Expired");
         }
-
         AppUser appUser = verificationToken.getAppUser();
         appUser.setVerified(true);
         userRepository.save(appUser);
@@ -84,14 +87,16 @@ public class AppUserService {
             emailBody=UUID.randomUUID().toString();
             VerificationToken newToken = new VerificationToken(emailBody, appUser);
             verificationTokenRepository.save(newToken);
+        }else{
+            emailBody=token.getToken();
         }
-        //DO mail user the email-body
+        mailerService.sendVerificationToken(email,token.getToken());
     }
 
 
-    public String resetPassword(ChangePasswordDTO changePassword) throws UnauthorizedException {
+    public void resetPassword(ChangePasswordDTO changePassword) throws UnauthorizedException, BadRequestException {
         if (!changePassword.getCurrentPassword().equals(changePassword.getConfirmCurrentPassword())) {
-            return "Passwords dont match";
+            throw new BadRequestException("Passwords don't match");
         }
         String currentEncodedPassword = passwordEncoder.encode(changePassword.getCurrentPassword());
         String emailId= SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
