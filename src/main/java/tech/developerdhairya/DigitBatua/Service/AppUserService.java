@@ -2,7 +2,6 @@ package tech.developerdhairya.DigitBatua.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,6 @@ import tech.developerdhairya.DigitBatua.Entity.AppUser;
 import tech.developerdhairya.DigitBatua.Entity.VerificationToken;
 import tech.developerdhairya.DigitBatua.Exception.BadRequestException;
 import tech.developerdhairya.DigitBatua.Exception.NotAcceptableException;
-import tech.developerdhairya.DigitBatua.Exception.NotFoundException;
 import tech.developerdhairya.DigitBatua.Exception.UnauthorizedException;
 import tech.developerdhairya.DigitBatua.Repository.AppUserRepository;
 import tech.developerdhairya.DigitBatua.Repository.VerificationTokenRepository;
@@ -48,7 +46,7 @@ public class AppUserService {
         appUser.setEmailId(registerUserDTO.getEmailId());
         appUser.setMobileNumber(registerUserDTO.getMobileNumber());
         appUser.setRole("USER");
-        appUser.setHashedPassword(encodedPassword);
+        appUser.setPassword(encodedPassword);
         return userRepository.save(appUser);
 
     }
@@ -102,11 +100,11 @@ public class AppUserService {
         String currentEncodedPassword = passwordEncoder.encode(changePassword.getCurrentPassword());
         String emailId= SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         AppUser appUser = userRepository.findByEmailId(emailId);
-        if (!appUser.getHashedPassword().equals(currentEncodedPassword)){
+        if (!appUser.getPassword().equals(currentEncodedPassword)){
             throw new UnauthorizedException("Current Password Is Invalid");
         }
         String newEncodedPassword = passwordEncoder.encode(changePassword.getCurrentPassword());
-        appUser.setHashedPassword(newEncodedPassword);
+        appUser.setPassword(newEncodedPassword);
         userRepository.save(appUser);
     }
 

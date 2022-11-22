@@ -8,6 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import tech.developerdhairya.DigitBatua.DTO.*;
 import tech.developerdhairya.DigitBatua.Entity.AppUser;
 import tech.developerdhairya.DigitBatua.Exception.BadRequestException;
@@ -40,6 +41,9 @@ public class AppUserController {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsServiceImpl;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
     public ResponseEntity<Object> registerUser(@RequestBody RegisterUserDTO registerUserDTO) {
@@ -94,9 +98,8 @@ public class AppUserController {
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<Object> authenticate(@RequestBody JWTRequest jwtRequest) throws UnauthorizedException,Exception {
+    public ResponseEntity<Object> authenticate(@RequestBody JWTRequest jwtRequest){
         try {
-            System.out.println(20);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     jwtRequest.getEmailId(),
                     jwtRequest.getPassword()
@@ -104,11 +107,10 @@ public class AppUserController {
             authenticationManager.authenticate(authenticationToken);
             UserDetails userDetails
                     = userDetailsServiceImpl.loadUserByUsername(jwtRequest.getEmailId());
-            String token =
-                    jwtUtil.generateToken(userDetails);
+            String token =jwtUtil.generateToken(userDetails);
             return ResponseHandler.generateSuccessResponse(new JWTResponse(token),HttpStatus.OK);
         } catch (BadCredentialsException e) {
-            return ResponseHandler.generateErrorResponse(HttpStatus.UNAUTHORIZED,e.getLocalizedMessage());
+            return ResponseHandler.generateErrorResponse(HttpStatus.UNAUTHORIZED,e.toString());
         }catch (UsernameNotFoundException e){
             return ResponseHandler.generateErrorResponse(HttpStatus.NOT_FOUND,e.getLocalizedMessage());
         }catch (Exception e){

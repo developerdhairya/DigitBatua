@@ -41,7 +41,7 @@ public class JWTFilter extends OncePerRequestFilter {
         if(context.getAuthentication()==null && username!=null){
             UserDetails userDetails= userDetailsServiceImpl.loadUserByUsername(username);
             if(jwtUtil.validateToken(jwt,userDetails)){
-                UsernamePasswordAuthenticationToken authToken=new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
+                UsernamePasswordAuthenticationToken authToken=new UsernamePasswordAuthenticationToken(username,userDetails.getPassword());
                 //Converting HTTPServlet(Java Class) to WebAuthenticationDetails (internal spring class)
                 WebAuthenticationDetails details=new WebAuthenticationDetailsSource().buildDetails(request);
                 authToken.setDetails(details);
