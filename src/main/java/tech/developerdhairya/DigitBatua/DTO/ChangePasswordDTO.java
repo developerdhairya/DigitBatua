@@ -12,5 +12,6 @@ public class ChangePasswordDTO {
 
     private String currentPassword;
     private String confirmCurrentPassword;
+    private String getNewPassword;
 
 }
