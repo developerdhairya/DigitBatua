@@ -36,11 +36,13 @@ public class JWTFilter extends OncePerRequestFilter {
         if(authHeader!=null && authHeader.startsWith("Bearer")){
             jwt=authHeader.substring(7);
             username=jwtUtil.getUsernameFromToken(jwt);
+            System.out.println(username);
         }
 
         if(context.getAuthentication()==null && username!=null){
             UserDetails userDetails= userDetailsServiceImpl.loadUserByUsername(username);
             if(jwtUtil.validateToken(jwt,userDetails)){
+                System.out.println(105);
                 UsernamePasswordAuthenticationToken authToken=new UsernamePasswordAuthenticationToken(username,userDetails.getPassword());
                 //Converting HTTPServlet(Java Class) to WebAuthenticationDetails (internal spring class)
                 WebAuthenticationDetails details=new WebAuthenticationDetailsSource().buildDetails(request);

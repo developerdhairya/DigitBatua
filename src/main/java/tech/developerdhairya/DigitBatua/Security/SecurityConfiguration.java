@@ -9,16 +9,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import tech.developerdhairya.DigitBatua.JWTFilter;
 import tech.developerdhairya.DigitBatua.Service.UserDetailsServiceImpl;
 
-import java.security.SecureRandom;
-
-@EnableWebSecurity @Configuration
+@EnableWebSecurity
+@Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -31,8 +29,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity security) throws Exception {
         security.csrf().disable()
                 .authorizeRequests()
-                .antMatchers(new String[]{"/register","/authenticate"}).permitAll()
-                .anyRequest().authenticated().and().sessionManagement()
+                .antMatchers(new String[]{"/register", "/authenticate"}).permitAll()
+                .antMatchers("/**").hasAnyRole()
+                .anyRequest().authenticated()
+                .and()
+                .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         security.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -44,8 +45,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         authenticationManagerBuilder.userDetailsService(userDetailsServiceImpl);
     }
 
-    @Bean @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception{
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 
