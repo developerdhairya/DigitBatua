@@ -103,7 +103,7 @@ public class AppUserService {
         if (!appUser.getPassword().equals(currentEncodedPassword)){
             throw new UnauthorizedException("Current Password Is Invalid");
         }
-        String newEncodedPassword = passwordEncoder.encode(changePassword.getCurrentPassword());
+        String newEncodedPassword = passwordEncoder.encode(changePassword.getNewPassword());
         appUser.setPassword(newEncodedPassword);
         userRepository.save(appUser);
     }
