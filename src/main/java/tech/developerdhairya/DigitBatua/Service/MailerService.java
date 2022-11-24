@@ -34,7 +34,7 @@ public class MailerService {
             msg.setFrom(sender);
             msg.setTo(recipient);
             msg.setSubject("DigitBatua");
-            msg.setText("Thanks for testing my project.Your unique verification code is ${token}");
+            msg.setText("Thanks for testing my project.Your unique verification code is "+token);
             msg.setSentDate(Date.valueOf(LocalDate.now()));
             msg.setReplyTo(sender);
             javaMailSender.send(msg);
