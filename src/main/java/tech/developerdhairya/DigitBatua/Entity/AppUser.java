@@ -2,13 +2,17 @@ package tech.developerdhairya.DigitBatua.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.Hibernate;
+import org.hibernate.annotations.*;
 import org.hibernate.validator.constraints.Length;
+
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.persistence.Entity;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 
@@ -16,11 +20,16 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
 @Entity
 @ToString
+@DynamicUpdate //To update only changed entities while saving
 public class AppUser {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(generator = "UUiD")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "user_id", columnDefinition = "char(36)")
+    @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID userId;
 
     @NotBlank
@@ -45,7 +54,7 @@ public class AppUser {
     private String password;          //not visible in json response
 
     @Column(nullable = false)
-    private String role="user";
+    private String role="USER";
 
     @Column(nullable = false)
     private boolean isVerified=false;
