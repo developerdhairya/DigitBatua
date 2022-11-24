@@ -33,8 +33,6 @@ public class AppUserController {
     @Autowired
     private AppUserService appUserService;
 
-    @Autowired
-    private AuthenticationUtil util;
 
     @Autowired
     private AuthenticationManager authenticationManager;
