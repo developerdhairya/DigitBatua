@@ -78,13 +78,15 @@ public class AppUserController {
 
     @GetMapping("/resendVerificationToken")
     public ResponseEntity<Object> resendVerificationToken() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println(email);
         try {
             appUserService.resendVerificationToken(email);
             return ResponseHandler.generateSuccessResponse(null, HttpStatus.ACCEPTED);
         } catch (NotAcceptableException e) {
             return ResponseHandler.generateErrorResponse(HttpStatus.NOT_ACCEPTABLE, e.getLocalizedMessage());
         } catch (Exception e) {
+            System.out.println(e);
             return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong!");
         }
     }
