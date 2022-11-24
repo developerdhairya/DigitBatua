@@ -14,6 +14,7 @@ import tech.developerdhairya.DigitBatua.Entity.AppUser;
 import tech.developerdhairya.DigitBatua.Exception.BadRequestException;
 import tech.developerdhairya.DigitBatua.Exception.NotAcceptableException;
 import tech.developerdhairya.DigitBatua.Exception.UnauthorizedException;
+import tech.developerdhairya.DigitBatua.Service.MailerService;
 import tech.developerdhairya.DigitBatua.Util.AuthenticationUtil;
 import tech.developerdhairya.DigitBatua.Util.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +43,6 @@ public class AppUserController {
     @Autowired
     private UserDetailsServiceImpl userDetailsServiceImpl;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
     public ResponseEntity<Object> registerUser(@RequestBody RegisterUserDTO registerUserDTO) {
@@ -92,12 +91,15 @@ public class AppUserController {
             return ResponseHandler.generateSuccessResponse(null,HttpStatus.OK);
         } catch (UnauthorizedException e) {
             return ResponseHandler.generateErrorResponse(HttpStatus.UNAUTHORIZED,e.getLocalizedMessage());
+        } catch (BadRequestException e) {
+            return ResponseHandler.generateErrorResponse(HttpStatus.BAD_REQUEST,e.getLocalizedMessage());
         }catch (Exception e){
+            System.out.println(e.getMessage());
             return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,"Something went wrong!");
         }
     }
 
-    @PostMapping("/authenticate")
+    @PostMapping("/login")
     public ResponseEntity<Object> authenticate(@RequestBody JWTRequest jwtRequest){
         try {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
@@ -107,8 +109,8 @@ public class AppUserController {
             authenticationManager.authenticate(authenticationToken);
             UserDetails userDetails
                     = userDetailsServiceImpl.loadUserByUsername(jwtRequest.getEmailId());
-            String token =jwtUtil.generateToken(userDetails);
-            return ResponseHandler.generateSuccessResponse(new JWTResponse(token),HttpStatus.OK);
+            String jwtToken =jwtUtil.generateToken(userDetails);
+            return ResponseHandler.generateSuccessResponse(new JWTResponse(jwtToken),HttpStatus.OK);
         } catch (BadCredentialsException e) {
             return ResponseHandler.generateErrorResponse(HttpStatus.UNAUTHORIZED,e.toString());
         }catch (UsernameNotFoundException e){

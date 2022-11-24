@@ -1,6 +1,8 @@
 package tech.developerdhairya.DigitBatua.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -10,6 +12,7 @@ import tech.developerdhairya.DigitBatua.Entity.AppUser;
 import tech.developerdhairya.DigitBatua.Repository.AppUserRepository;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -23,7 +26,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if(user==null){
             throw new UsernameNotFoundException("User not Found");
         };
-        return new User(email, user.getPassword(), new ArrayList<>());
+        String password=user.getPassword();
+        List<GrantedAuthority> roles=new ArrayList<>();
+        roles.add(new SimpleGrantedAuthority(user.getRole()));
+        return new User(email, user.getPassword(), roles);
     }
 
 }

@@ -43,11 +43,12 @@ public class JWTFilter extends OncePerRequestFilter {
             UserDetails userDetails= userDetailsServiceImpl.loadUserByUsername(username);
             if(jwtUtil.validateToken(jwt,userDetails)){
                 System.out.println(105);
-                UsernamePasswordAuthenticationToken authToken=new UsernamePasswordAuthenticationToken(username,userDetails.getPassword());
+                UsernamePasswordAuthenticationToken authToken=new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
                 //Converting HTTPServlet(Java Class) to WebAuthenticationDetails (internal spring class)
                 WebAuthenticationDetails details=new WebAuthenticationDetailsSource().buildDetails(request);
                 authToken.setDetails(details);
                 context.setAuthentication(authToken);
+
             }
         }
         filterChain.doFilter(request,response);  // same as next() node.js
