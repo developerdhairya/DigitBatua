@@ -28,11 +28,11 @@ public class Transaction {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "from_wallet_id", nullable = false)
-    private Wallet p1;
+    private Wallet from;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "to_wallet_id", nullable = false)
-    private Wallet p2;
+    private Wallet to;
 
     @Min(message = "Minimum Transaction amount should be Rs.1", value = 1)
     @Column(nullable = false)
