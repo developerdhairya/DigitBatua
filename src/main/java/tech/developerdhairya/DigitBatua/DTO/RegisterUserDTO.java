@@ -25,9 +25,6 @@ public class RegisterUserDTO {
     @Size(min = 8, max = 30, message = "Password should be between 9 and 20 characters")
     private String password;
     @NotBlank
-    @Size(min = 8, max = 30, message = "Password should be between 9 and 20 characters")
-    private String confirmPassword;
-    @NotBlank
     @Size(min = 10, max = 13, message = "Invalid Mobile Number")
     private String mobileNumber;
 }
