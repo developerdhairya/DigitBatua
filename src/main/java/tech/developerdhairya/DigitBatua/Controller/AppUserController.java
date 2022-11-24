@@ -61,10 +61,10 @@ public class AppUserController {
         }
     }
 
-    @GetMapping("/verifyRegistration")
-    public ResponseEntity<Object> verifyRegistration(@RequestParam("token") String token) {
+    @PostMapping("/verifyRegistration")
+    public ResponseEntity<Object> verifyRegistration(@RequestBody VerifyRegistrationDTO verifyRegistrationDTO) {
         try {
-            appUserService.validateVerificationToken(token);
+            appUserService.validateVerificationToken(verifyRegistrationDTO.getToken());
             return ResponseHandler.generateSuccessResponse(null, HttpStatus.ACCEPTED);
         } catch (BadRequestException e) {
             e.printStackTrace(); //log error
@@ -79,7 +79,6 @@ public class AppUserController {
     @GetMapping("/resendVerificationToken")
     public ResponseEntity<Object> resendVerificationToken() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        System.out.println(email);
         try {
             appUserService.resendVerificationToken(email);
             return ResponseHandler.generateSuccessResponse(null, HttpStatus.ACCEPTED);
@@ -127,13 +126,16 @@ public class AppUserController {
         }
     }
 
-    @GetMapping("/test")
-    public String test() {
+//    @PostMapping("update/mobileNumber")
+
+    @GetMapping("/getByEmailId")
+    public ResponseEntity<Object> getUserByEmailId(GetUserDTO getUserDTO) {
         try {
-            return paymentService.generatePaymentLink(20000, "jf6766esgER$j", "taneja.dhairya12@gmail.com");
-        } catch (RazorpayException e) {
+            GetUserResponse responseData=appUserService.getUserByEmailId(getUserDTO.getEmailId());
+            return ResponseHandler.generateSuccessResponse(responseData,HttpStatus.OK);
+        }catch (BadRequestException e) {
             e.printStackTrace();
-            return null;
+            return  ResponseHandler.generateErrorResponse(HttpStatus.BAD_REQUEST,e.getLocalizedMessage());
         }
     }
 

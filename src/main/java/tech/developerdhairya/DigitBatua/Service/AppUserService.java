@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tech.developerdhairya.DigitBatua.DTO.ChangePasswordDTO;
+import tech.developerdhairya.DigitBatua.DTO.GetUserResponse;
 import tech.developerdhairya.DigitBatua.DTO.RegisterUserDTO;
 import tech.developerdhairya.DigitBatua.Entity.AppUser;
 import tech.developerdhairya.DigitBatua.Entity.VerificationToken;
@@ -68,9 +69,10 @@ public class AppUserService {
 
     //enable user
     public void validateVerificationToken(String token) throws BadRequestException, UnauthorizedException {
+        System.out.println(token);
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token);
         if (verificationToken == null) {
-            throw new BadRequestException("Verification Token Required");
+            throw new BadRequestException("Invalid token");
         }
         if (util.checkTokenExpiry(verificationToken)) {
             throw new UnauthorizedException("Token Expired");
@@ -82,8 +84,8 @@ public class AppUserService {
     }
 
 
-    public void resendVerificationToken(String email) throws NotAcceptableException {
-        AppUser appUser = userRepository.findByEmailId(email);
+    public void resendVerificationToken(String emailId) throws NotAcceptableException {
+        AppUser appUser = userRepository.findByEmailId(emailId);
         if (appUser.isVerified()) {
            throw new NotAcceptableException("User has already been verified");
         }
@@ -97,7 +99,7 @@ public class AppUserService {
         }else{
             emailBody=token.getToken();
         }
-        mailerService.sendVerificationToken(email,token.getToken());
+        mailerService.sendVerificationToken(emailId,emailBody);
     }
 
 
@@ -113,6 +115,14 @@ public class AppUserService {
         String newEncodedPassword = passwordEncoder.encode(changePassword.getNewPassword());
         appUser.setPassword(newEncodedPassword);
         userRepository.save(appUser);
+    }
+
+    public GetUserResponse getUserByEmailId(String emailId) throws BadRequestException {
+        AppUser appUser=userRepository.findByEmailId(emailId);
+        if(appUser==null){
+            throw new BadRequestException("No user exists with the given emailId");
+        }
+        return new GetUserResponse(appUser.getEmailId(),appUser.getFirstName(),appUser.getLastName(),appUser.getMobileNumber());
     }
 
 
