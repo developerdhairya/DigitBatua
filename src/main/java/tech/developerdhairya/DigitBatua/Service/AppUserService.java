@@ -5,6 +5,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tech.developerdhairya.DigitBatua.DTO.ChangePasswordDTO;
 import tech.developerdhairya.DigitBatua.DTO.RegisterUserDTO;
 import tech.developerdhairya.DigitBatua.Entity.AppUser;
@@ -16,6 +17,8 @@ import tech.developerdhairya.DigitBatua.Repository.AppUserRepository;
 import tech.developerdhairya.DigitBatua.Repository.VerificationTokenRepository;
 import tech.developerdhairya.DigitBatua.Util.AuthenticationUtil;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -37,6 +40,7 @@ public class AppUserService {
     private MailerService mailerService;
 
 
+    @Transactional
     public AppUser registerUser(RegisterUserDTO registerUserDTO) throws DataIntegrityViolationException {
         String password = registerUserDTO.getPassword();
         String encodedPassword = passwordEncoder.encode(password);
@@ -47,8 +51,12 @@ public class AppUserService {
         appUser.setMobileNumber(registerUserDTO.getMobileNumber());
         appUser.setRole("USER");
         appUser.setPassword(encodedPassword);
-        return userRepository.save(appUser);
-
+        userRepository.save(appUser);
+        String token=UUID.randomUUID().toString();
+        VerificationToken verificationToken=new VerificationToken(token, appUser);
+        verificationTokenRepository.save(verificationToken);
+        mailerService.sendVerificationToken(registerUserDTO.getEmailId(),token);
+        return appUser;
     }
 
 
@@ -97,16 +105,16 @@ public class AppUserService {
         if (!changePassword.getCurrentPassword().equals(changePassword.getConfirmCurrentPassword())) {
             throw new BadRequestException("Passwords don't match");
         }
-        String currentEncodedPassword = passwordEncoder.encode(changePassword.getCurrentPassword());
-        String emailId= SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        String emailId= SecurityContextHolder.getContext().getAuthentication().getName();
         AppUser appUser = userRepository.findByEmailId(emailId);
-        if (!appUser.getPassword().equals(currentEncodedPassword)){
+        if (!passwordEncoder.matches(changePassword.getCurrentPassword(),appUser.getPassword())){
             throw new UnauthorizedException("Current Password Is Invalid");
         }
         String newEncodedPassword = passwordEncoder.encode(changePassword.getNewPassword());
         appUser.setPassword(newEncodedPassword);
         userRepository.save(appUser);
     }
+
 
 
 
