@@ -1,8 +1,9 @@
 package tech.developerdhairya.DigitBatua.DTO;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 
-@AllArgsConstructor
+@AllArgsConstructor @Data
 public class GetUserResponse {
     String emailId;
     String firstName;

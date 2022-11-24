@@ -61,7 +61,7 @@ public class AppUserController {
         }
     }
 
-    @PostMapping("/verifyRegistration")
+    @PutMapping("/verifyRegistration")
     public ResponseEntity<Object> verifyRegistration(@RequestBody VerifyRegistrationDTO verifyRegistrationDTO) {
         try {
             appUserService.validateVerificationToken(verifyRegistrationDTO.getToken());
@@ -90,7 +90,7 @@ public class AppUserController {
         }
     }
 
-    @PostMapping("/resetPassword")
+    @PutMapping("/resetPassword")
     public ResponseEntity<Object> resetPassword(@NotNull @RequestBody ChangePasswordDTO changePasswordDTO) {
         try {
             appUserService.resetPassword(changePasswordDTO);
@@ -129,9 +129,9 @@ public class AppUserController {
 //    @PostMapping("update/mobileNumber")
 
     @GetMapping("/getByEmailId")
-    public ResponseEntity<Object> getUserByEmailId(GetUserDTO getUserDTO) {
+    public ResponseEntity<Object> getUserByEmailId(@RequestParam String emailId) {
         try {
-            GetUserResponse responseData=appUserService.getUserByEmailId(getUserDTO.getEmailId());
+            GetUserResponse responseData=appUserService.getUserByEmailId(emailId);
             return ResponseHandler.generateSuccessResponse(responseData,HttpStatus.OK);
         }catch (BadRequestException e) {
             e.printStackTrace();
