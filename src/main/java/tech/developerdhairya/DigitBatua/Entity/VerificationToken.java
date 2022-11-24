@@ -1,14 +1,20 @@
 package tech.developerdhairya.DigitBatua.Entity;
 
 
+import lombok.*;
+import org.hibernate.Hibernate;
 import tech.developerdhairya.DigitBatua.Util.AuthenticationUtil;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Objects;
 
-@Entity @Data
-@NoArgsConstructor
+@Entity
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor
 public class VerificationToken{
     private static AuthenticationUtil util=new AuthenticationUtil();
 
@@ -30,8 +36,8 @@ public class VerificationToken{
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id",nullable = false)
+    @ToString.Exclude
     private AppUser appUser;
-
 
 
 
