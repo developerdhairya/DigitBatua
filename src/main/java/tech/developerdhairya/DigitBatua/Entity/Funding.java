@@ -39,7 +39,7 @@ public class Funding {
     @URL
     private String rzpPaymentLink;
 
-    @NotBlank
+    @NotBlank @NotNull
     private String status;
 
 

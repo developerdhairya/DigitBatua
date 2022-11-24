@@ -15,6 +15,7 @@ import tech.developerdhairya.DigitBatua.Exception.BadRequestException;
 import tech.developerdhairya.DigitBatua.Exception.NotAcceptableException;
 import tech.developerdhairya.DigitBatua.Exception.UnauthorizedException;
 import tech.developerdhairya.DigitBatua.Service.MailerService;
+import tech.developerdhairya.DigitBatua.Service.PaymentService;
 import tech.developerdhairya.DigitBatua.Util.AuthenticationUtil;
 import tech.developerdhairya.DigitBatua.Util.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 import tech.developerdhairya.DigitBatua.Service.AppUserService;
 import tech.developerdhairya.DigitBatua.Service.UserDetailsServiceImpl;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 
 @RestController
@@ -43,9 +46,12 @@ public class AppUserController {
     @Autowired
     private UserDetailsServiceImpl userDetailsServiceImpl;
 
+    @Autowired
+    private PaymentService paymentService;
+
 
     @PostMapping("/register")
-    public ResponseEntity<Object> registerUser(@RequestBody RegisterUserDTO registerUserDTO) {
+    public ResponseEntity<Object> registerUser(@Valid @RequestBody RegisterUserDTO registerUserDTO) {
         try {
             AppUser appUser = appUserService.registerUser(registerUserDTO);
             return ResponseHandler.generateSuccessResponse(appUser, HttpStatus.CREATED);
@@ -85,7 +91,7 @@ public class AppUserController {
     }
 
     @PostMapping("/resetPassword")
-    public ResponseEntity<Object> resetPassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+    public ResponseEntity<Object> resetPassword(@NotNull @RequestBody ChangePasswordDTO changePasswordDTO) {
         try {
             appUserService.resetPassword(changePasswordDTO);
             return ResponseHandler.generateSuccessResponse(null,HttpStatus.OK);
@@ -100,7 +106,7 @@ public class AppUserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Object> authenticate(@RequestBody JWTRequest jwtRequest){
+    public ResponseEntity<Object> authenticate(@NotNull @RequestBody JWTRequest jwtRequest){
         try {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     jwtRequest.getEmailId(),
@@ -119,4 +125,11 @@ public class AppUserController {
             return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,"Something went wrong!");
         }
     }
+
+    @GetMapping("/test")
+    public void test(){
+        paymentService.generatePaymentLink();
+    }
+
+
 }

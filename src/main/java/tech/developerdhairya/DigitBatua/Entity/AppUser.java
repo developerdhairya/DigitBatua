@@ -2,17 +2,18 @@ package tech.developerdhairya.DigitBatua.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import org.hibernate.Hibernate;
 import org.hibernate.annotations.*;
 import org.hibernate.validator.constraints.Length;
-
-import javax.persistence.*;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.UUID;
 
 
@@ -33,12 +34,12 @@ public class AppUser {
     private UUID userId;
 
     @NotBlank
-    @Length(message = "Length of firstName should be b/w 2-50", min = 2, max = 50)
+    @Size(min = 2,max = 20,message = "firstName should be between 2 and 20 characters")
     @Column(nullable = false)
     private String firstName;
 
     @NotBlank
-    @Length(message = "Length of lastName should be b/w 2-50", min = 2, max = 50)
+    @Size(min = 2,max = 20,message = "lastName should be between 2 and 20 characters")
     @Column(nullable = false)
     private String lastName;
 
@@ -46,7 +47,8 @@ public class AppUser {
     @Email(message = "Invalid emailId")
     private String emailId;
 
-    @Column(nullable = false, unique = true, length = 10)
+    @Column(nullable = false, unique = true)
+    @Size(min = 10,max = 13,message = "Invalid Mobile Number")
     private String mobileNumber;
 
     @Column(nullable = false)
@@ -54,13 +56,13 @@ public class AppUser {
     private String password;          //not visible in json response
 
     @Column(nullable = false)
-    private String role="USER";
+    private String role = "USER";
 
     @Column(nullable = false)
-    private boolean isVerified=false;
+    private boolean isVerified = false;
 
     @CreationTimestamp
-    private Timestamp creationTimestamp=Timestamp.valueOf(LocalDateTime.now());
+    private Timestamp creationTimestamp = Timestamp.valueOf(LocalDateTime.now());
 
     @UpdateTimestamp
     private Timestamp updateTimestamp;
