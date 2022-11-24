@@ -28,10 +28,10 @@ public class Wallet {
     @Max(message = "Max balance allowed is 10000000", value = 10000000)
     @Min(message = "Negative Balance not allowed", value = 0)
     @Column(nullable = false)
-    private Integer balance;
+    private Integer balance=0;
 
     @Column(nullable = false)
-    private boolean isActivated;
+    private boolean isActivated=false;
 
     @CreationTimestamp
     private Timestamp creationTimestamp;
