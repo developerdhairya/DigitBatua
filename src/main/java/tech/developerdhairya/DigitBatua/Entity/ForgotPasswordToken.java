@@ -18,3 +18,4 @@ public class ForgotPasswordToken {
     private AppUser userId;
 
 }
+
