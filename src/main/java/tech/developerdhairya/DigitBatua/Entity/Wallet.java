@@ -30,9 +30,6 @@ public class Wallet {
     @Column(nullable = false)
     private Integer balance=0;
 
-    @Column(nullable = false)
-    private boolean isActivated=false;
-
     @CreationTimestamp
     private Timestamp creationTimestamp;
 
