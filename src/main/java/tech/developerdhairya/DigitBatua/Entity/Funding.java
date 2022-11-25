@@ -2,6 +2,8 @@ package tech.developerdhairya.DigitBatua.Entity;
 
 
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.*;
@@ -19,7 +21,10 @@ import java.util.UUID;
 public class Funding {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(generator = "UUiD")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "funding_id", columnDefinition = "char(36)")
+    @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID fundingId;
 
 
@@ -29,7 +34,7 @@ public class Funding {
 
     @Min(message = "Minimum Transaction amount should be Rs.1", value = 1)
     @Column(nullable = false)
-    private Long amount;
+    private Integer amount;
 
     @Column(nullable = false, unique = true)
     @NotBlank
@@ -40,7 +45,7 @@ public class Funding {
     private String rzpPaymentLink;
 
     @NotBlank @NotNull
-    private String status;
+    private String status="pending";
 
 
 }
