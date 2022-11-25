@@ -61,11 +61,6 @@ public class AppUserService {
     }
 
 
-    public void saveUserVerificationToken(String token, AppUser appUser) {
-        VerificationToken verificationToken = new VerificationToken(token, appUser);
-        verificationTokenRepository.save(verificationToken);
-
-    }
 
     //enable user
     public void validateVerificationToken(String token) throws BadRequestException, UnauthorizedException {
@@ -101,6 +96,8 @@ public class AppUserService {
         }
         mailerService.sendVerificationToken(emailId,emailBody);
     }
+
+//    public void
 
 
     public void resetPassword(ChangePasswordDTO changePassword) throws UnauthorizedException, BadRequestException {
