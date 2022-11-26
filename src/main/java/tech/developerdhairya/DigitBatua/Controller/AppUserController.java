@@ -103,6 +103,33 @@ public class AppUserController {
         }
     }
 
+    @GetMapping("/forgotPassword")
+    public ResponseEntity<Object> sendForgotPasswordToken(@RequestParam String emailId) {
+        try {
+            appUserService.sendForgotPasswordToken(emailId);
+            return ResponseHandler.generateSuccessResponse(null, HttpStatus.ACCEPTED);
+        } catch (BadRequestException e) {
+            return ResponseHandler.generateErrorResponse(HttpStatus.BAD_REQUEST, e.getLocalizedMessage());
+        } catch (Exception e) {
+            return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong!");
+        }
+    }
+
+    @PutMapping("/resetPasswordByToken")
+    public ResponseEntity<Object> resetPasswordByToken(@RequestBody ResetPasswordByTokenDTO tokenDTO){
+        try {
+            appUserService.resetForgottenPassword(tokenDTO);
+            return ResponseHandler.generateSuccessResponse(null, HttpStatus.OK);
+        } catch (BadRequestException e) {
+            return ResponseHandler.generateErrorResponse(HttpStatus.BAD_REQUEST, e.getLocalizedMessage());
+        } catch (UnauthorizedException e) {
+            return ResponseHandler.generateErrorResponse(HttpStatus.UNAUTHORIZED, e.getLocalizedMessage());
+        } catch (Exception e) {
+            return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong!");
+        }
+    }
+
+
     @PostMapping("/login")
     public ResponseEntity<Object> authenticate(@NotNull @RequestBody JWTRequest jwtRequest) {
         try {
@@ -124,7 +151,6 @@ public class AppUserController {
         }
     }
 
-//    @PostMapping("update/mobileNumber")
 
     @GetMapping("/getByEmailId")
     public ResponseEntity<Object> getUserByEmailId(@RequestParam String emailId) {
