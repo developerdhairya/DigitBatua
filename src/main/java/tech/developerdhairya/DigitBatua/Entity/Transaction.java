@@ -36,15 +36,7 @@ public class Transaction {
 
     @Min(message = "Minimum Transaction amount should be Rs.1", value = 1)
     @Column(nullable = false)
-    private Long amount;
-
-    @Column(nullable = false, unique = true)
-    @NotBlank
-    private String paymentId;
-
-    @NotNull
-    @URL
-    private String paymentLink;
+    private Integer amount;
 
     @NotBlank
     private String status;
