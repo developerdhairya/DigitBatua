@@ -15,11 +15,7 @@ import java.util.Objects;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public class VerificationToken{
-    private static AuthenticationUtil util=new AuthenticationUtil();
-
-    private static final int EXPIRATION_TIME=10;
-
+public class VerificationToken implements Token{
     public VerificationToken(String token, AppUser appUser) {
         this.token = token;
         this.appUser = appUser;

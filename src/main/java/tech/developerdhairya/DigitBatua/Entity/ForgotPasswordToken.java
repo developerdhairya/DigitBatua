@@ -1,11 +1,24 @@
 package tech.developerdhairya.DigitBatua.Entity;
 
-import lombok.Data;
+import lombok.*;
+import tech.developerdhairya.DigitBatua.Util.AuthenticationUtil;
 
 import javax.persistence.*;
+import java.util.Date;
 
-@Data @Entity
-public class ForgotPasswordToken {
+@Entity
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor
+public class ForgotPasswordToken implements Token{
+
+    public ForgotPasswordToken(String token, AppUser appUser) {
+        this.token = token;
+        this.appUser = appUser;
+        this.expirationTime=util.calculateExpirationTime(EXPIRATION_TIME);
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -13,9 +26,12 @@ public class ForgotPasswordToken {
 
     private String token;
 
-    @OneToOne(optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private AppUser userId;
+    private Date expirationTime;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id",nullable = false)
+    @ToString.Exclude
+    private AppUser appUser;
 
 }
 
