@@ -34,7 +34,7 @@ public class MailerService {
             msg.setFrom(sender);
             msg.setTo(recipient);
             msg.setSubject("DigitBatua");
-            msg.setText("Thanks for testing my project.Your unique verification code is "+token);
+            msg.setText("Thanks for testing my project.Your unique verification code is "+token+". It is valid for 10 minutes only");
             msg.setSentDate(Date.valueOf(LocalDate.now()));
             msg.setReplyTo(sender);
             javaMailSender.send(msg);
@@ -45,12 +45,17 @@ public class MailerService {
     }
 
     @Async
-    public void sendForgotPassword(String recipient, String token) {
-        SimpleMailMessage msg = new SimpleMailMessage();
-        msg.setTo(recipient);
-        msg.setSubject("DigitBatua");
-        msg.setText("Thanks for testing my project.Click on the link to reset your account" + "url" + "/forgotPassword?userId=" + recipient + "&token=" + token);
-        javaMailSender.send(msg);
+    public void sendForgotPasswordToken(String recipient, String token) {
+        try{
+            SimpleMailMessage msg = new SimpleMailMessage();
+            msg.setTo(recipient);
+            msg.setSubject("DigitBatua");
+            msg.setText("Thanks for testing my project.Your unique Forgot code is"+token+". It is valid for 10 minutes only");
+            javaMailSender.send(msg);
+            System.out.println("Mail sent Successfully");
+        }catch (Exception e){
+            System.out.println(e);
+        }
     }
 
 }
