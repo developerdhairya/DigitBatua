@@ -9,17 +9,18 @@ import org.springframework.transaction.annotation.Transactional;
 import tech.developerdhairya.DigitBatua.DTO.ChangePasswordDTO;
 import tech.developerdhairya.DigitBatua.DTO.GetUserResponse;
 import tech.developerdhairya.DigitBatua.DTO.RegisterUserDTO;
+import tech.developerdhairya.DigitBatua.DTO.ResetPasswordByTokenDTO;
 import tech.developerdhairya.DigitBatua.Entity.AppUser;
+import tech.developerdhairya.DigitBatua.Entity.ForgotPasswordToken;
 import tech.developerdhairya.DigitBatua.Entity.VerificationToken;
 import tech.developerdhairya.DigitBatua.Exception.BadRequestException;
 import tech.developerdhairya.DigitBatua.Exception.NotAcceptableException;
 import tech.developerdhairya.DigitBatua.Exception.UnauthorizedException;
 import tech.developerdhairya.DigitBatua.Repository.AppUserRepository;
+import tech.developerdhairya.DigitBatua.Repository.ForgotPasswordTokenRepository;
 import tech.developerdhairya.DigitBatua.Repository.VerificationTokenRepository;
 import tech.developerdhairya.DigitBatua.Util.AuthenticationUtil;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -30,6 +31,9 @@ public class AppUserService {
 
     @Autowired
     private VerificationTokenRepository verificationTokenRepository;
+
+    @Autowired
+    private ForgotPasswordTokenRepository forgotPasswordTokenRepository;
 
     @Autowired
     private AuthenticationUtil util;
@@ -78,7 +82,7 @@ public class AppUserService {
         verificationTokenRepository.delete(verificationToken);
     }
 
-
+    @Transactional
     public void resendVerificationToken(String emailId) throws NotAcceptableException {
         AppUser appUser = userRepository.findByEmailId(emailId);
         if (appUser.isVerified()) {
@@ -97,7 +101,40 @@ public class AppUserService {
         mailerService.sendVerificationToken(emailId,emailBody);
     }
 
-//    public void
+    @Transactional
+    public void sendForgotPasswordToken(String emailId) throws BadRequestException {
+        AppUser appUser = userRepository.findByEmailId(emailId);
+        if(appUser==null){
+            throw new BadRequestException("No user with this emailId exists");
+        }
+        String tokenBody=UUID.randomUUID().toString();
+        ForgotPasswordToken newToken = new ForgotPasswordToken(tokenBody, appUser);
+        forgotPasswordTokenRepository.save(newToken);
+        mailerService.sendForgotPasswordToken(emailId,tokenBody);
+    }
+
+    @Transactional
+    public void resetForgottenPassword(ResetPasswordByTokenDTO tokenDTO) throws BadRequestException, UnauthorizedException {
+        if(!tokenDTO.getNewPassword().equals(tokenDTO.getConfirmNewPassword())){
+            throw new BadRequestException("Passwords don't match");
+        }
+        ForgotPasswordToken token=forgotPasswordTokenRepository.findByToken(tokenDTO.getToken());
+        if(token==null){
+            throw new BadRequestException("Invalid Token");
+        }
+        if(util.checkTokenExpiry(token)){
+            throw new UnauthorizedException("Token Expired");
+        }
+
+        AppUser appUser=token.getAppUser();
+        forgotPasswordTokenRepository.delete(token);
+        if(!appUser.getEmailId().equals(tokenDTO.getEmailId())){
+            throw new UnauthorizedException("Invalid Details");
+        }
+        String hashedPassword=passwordEncoder.encode(tokenDTO.getNewPassword());
+        appUser.setPassword(hashedPassword);
+        userRepository.save(appUser);
+    }
 
 
     public void resetPassword(ChangePasswordDTO changePassword) throws UnauthorizedException, BadRequestException {
@@ -121,6 +158,8 @@ public class AppUserService {
         }
         return new GetUserResponse(appUser.getEmailId(),appUser.getFirstName(),appUser.getLastName(),appUser.getMobileNumber());
     }
+
+
 
 
 

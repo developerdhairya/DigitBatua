@@ -1,6 +1,7 @@
 package tech.developerdhairya.DigitBatua.Util;
 
 import org.springframework.stereotype.Component;
+import tech.developerdhairya.DigitBatua.Entity.Token;
 import tech.developerdhairya.DigitBatua.Entity.VerificationToken;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +24,7 @@ public class AuthenticationUtil {
         return calendar.getTime();
     }
 
-    public boolean checkTokenExpiry(VerificationToken token){
+    public boolean checkTokenExpiry(Token token){
         Calendar calendar=Calendar.getInstance();
         return token.getExpirationTime().getTime()<calendar.getTime().getTime();
     }
