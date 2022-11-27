@@ -1,5 +1,6 @@
 package tech.developerdhairya.DigitBatua.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
@@ -23,22 +24,24 @@ public class MoneyRequest {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "money_request_id", columnDefinition = "char(36)")
     @Type(type = "org.hibernate.type.UUIDCharType")
-    private UUID requesterId;
+    private UUID moneyRequestId;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false,fetch = FetchType.EAGER)
     @JoinColumn(name = "requester_wallet_id", nullable = false)
     private Wallet requesterWallet;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false,fetch = FetchType.EAGER)
     @JoinColumn(name = "request_receiver_wallet_id", nullable = false)
     private Wallet requestReceiverWallet;
 
-    @Min(message = "Minimum Transaction amount should be Rs.1", value = 1)
+    @Min(message = "Minimum Transaction amount should be Rs.1", value = 100)
     @Column(nullable = false)
     private Integer amount;
 
     @NotBlank @NotNull
-    private String status="pending";
+    private String status="Pending";
+
+    private String message;
 
 
 }
