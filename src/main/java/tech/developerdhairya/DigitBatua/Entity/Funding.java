@@ -21,8 +21,6 @@ import java.util.UUID;
 public class Funding {
 
     @Id
-    @GeneratedValue(generator = "UUiD")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "funding_id", columnDefinition = "char(36)")
     @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID fundingId;
@@ -32,7 +30,7 @@ public class Funding {
     @JoinColumn(name = "wallet_id", nullable = false)
     private Wallet wallet;
 
-    @Min(message = "Minimum Transaction amount should be Rs.1", value = 1)
+    @Min(message = "Minimum Transaction amount should be Rs.1", value = 100)
     @Column(nullable = false)
     private Integer amount;
 
