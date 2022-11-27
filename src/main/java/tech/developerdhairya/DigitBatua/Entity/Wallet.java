@@ -30,7 +30,7 @@ public class Wallet {
     @JoinColumn(name = "user_id")
     private AppUser appUser;
 
-    @Max(message = "Max balance allowed is 10000000", value = 10000000)
+    @Max(message = "Max balance allowed is Rs.100000", value = 10000000)
     @Min(message = "Negative Balance not allowed", value = 0)
     @Column(nullable = false)
     private Integer balance=0;
