@@ -34,12 +34,14 @@ public class Transaction {
     @JoinColumn(name = "to_wallet_id", nullable = false)
     private Wallet to;
 
-    @Min(message = "Minimum Transaction amount should be Rs.1", value = 1)
+    @Min(message = "Minimum Transaction amount should be Rs.1", value = 100)
     @Column(nullable = false)
     private Integer amount;
 
     @NotBlank
     private String status;
+
+    private String message;
 
 
 }
