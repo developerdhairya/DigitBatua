@@ -11,6 +11,8 @@ import tech.developerdhairya.DigitBatua.Entity.AppUser;
 import tech.developerdhairya.DigitBatua.Entity.Funding;
 import tech.developerdhairya.DigitBatua.Entity.Wallet;
 import tech.developerdhairya.DigitBatua.Exception.BadRequestException;
+import tech.developerdhairya.DigitBatua.Exception.ForbiddenException;
+import tech.developerdhairya.DigitBatua.Exception.NotFoundException;
 import tech.developerdhairya.DigitBatua.Exception.PaymentRequiredException;
 import tech.developerdhairya.DigitBatua.Repository.AppUserRepository;
 import tech.developerdhairya.DigitBatua.Repository.FundingRepository;
@@ -38,8 +40,11 @@ public class WalletService {
     @Autowired
     private AuthenticationUtil authenticationUtil;
 
-    public Wallet activateWallet(String emailId) throws BadRequestException {
+    public Wallet activateWallet(String emailId) throws BadRequestException, ForbiddenException {
         AppUser appUser=appUserRepository.findByEmailId(emailId);
+        if(!appUser.isVerified()){
+            throw new ForbiddenException("User not verified");
+        }
         Wallet wallet=walletRepository.findByAppUser_EmailId(emailId);
         if(wallet!=null){
             throw new BadRequestException("Wallet Already Activated for the given user");
@@ -48,6 +53,15 @@ public class WalletService {
         wallet1.setAppUser(appUser);
         return walletRepository.save(wallet1);
     }
+
+    public Wallet getWalletDetails(String emailId) throws NotFoundException {
+        Wallet wallet=walletRepository.findByAppUser_EmailId(emailId);
+        if(wallet==null){
+            throw new NotFoundException("Wallet Not Activated for the given account");
+        }
+        return walletRepository.save(wallet);
+    }
+
 
     @Transactional
     public FundWalletResponse fundWallet(String emailId,Integer amount) throws BadRequestException, RazorpayException {
