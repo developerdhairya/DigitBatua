@@ -25,11 +25,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private JWTFilter jwtFilter;
 
+    private String[] whitelistedRoutes=new String[]{"/register", "/login","/verifyRegistration","/getByEmailId","/wallet/funding/verify","/forgotPassword","/resetPasswordByToken"};
+
     @Override
     public void configure(HttpSecurity security) throws Exception {
         security.csrf().disable()
                 .authorizeRequests()
-                .antMatchers(new String[]{"/register", "/login","/verifyRegistration","/getByEmailId","funding/verify","/forgotPassword","/resetPasswordByToken"}).permitAll()
+                .antMatchers(whitelistedRoutes).permitAll()
 //                .antMatchers("/**").hasRole("USER")
                 .anyRequest().authenticated()
                 .and()
