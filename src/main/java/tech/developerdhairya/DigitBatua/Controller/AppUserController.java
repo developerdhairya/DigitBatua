@@ -143,7 +143,7 @@ public class AppUserController {
             String jwtToken = jwtUtil.generateToken(userDetails);
             return ResponseHandler.generateSuccessResponse(new JWTResponse(jwtToken), HttpStatus.OK);
         } catch (BadCredentialsException e) {
-            return ResponseHandler.generateErrorResponse(HttpStatus.UNAUTHORIZED, e.toString());
+            return ResponseHandler.generateErrorResponse(HttpStatus.UNAUTHORIZED, e.getLocalizedMessage());
         } catch (UsernameNotFoundException e) {
             return ResponseHandler.generateErrorResponse(HttpStatus.NOT_FOUND, e.getLocalizedMessage());
         } catch (Exception e) {
