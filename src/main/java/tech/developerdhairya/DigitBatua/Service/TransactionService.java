@@ -19,9 +19,9 @@ import tech.developerdhairya.DigitBatua.Exception.PaymentRequiredException;
 import tech.developerdhairya.DigitBatua.Repository.MoneyRequestRepository;
 import tech.developerdhairya.DigitBatua.Repository.TransactionRepository;
 import tech.developerdhairya.DigitBatua.Repository.WalletRepository;
-import tech.developerdhairya.DigitBatua.Util.MoneyRequestStatus;
-import tech.developerdhairya.DigitBatua.Util.TransactionStatus;
-import tech.developerdhairya.DigitBatua.Util.TransactionType;
+import tech.developerdhairya.DigitBatua.Enum.MoneyRequestStatus;
+import tech.developerdhairya.DigitBatua.Enum.TransactionStatus;
+import tech.developerdhairya.DigitBatua.Enum.TransactionType;
 
 import java.util.List;
 import java.util.Optional;
@@ -131,7 +131,6 @@ public class TransactionService {
         return null;
     }
 
-//add pagination
 
     public List<MoneyRequestFilteredResponse> getAllReceivedMoneyRequests(String emailId,Integer pageNumber,Integer pageSize ) {
         Pageable pageable =
@@ -140,7 +139,7 @@ public class TransactionService {
         return MoneyRequestFilteredResponse.filterList(response);
     }
 
-    public List<MoneyRequestFilteredResponse> getAllSentMoneyRequests(String emailId,Integer pageNumber,Integer pageSize) {
+    public List<MoneyRequestFilteredResponse> getAllSentMoneyRequests(String emailId,Integer pageNumber,Integer pageSize) throws IllegalArgumentException{
         Pageable pageable =
                 PageRequest.of(pageNumber,pageSize, Sort.by("updateTimestamp").descending());
         List<MoneyRequest> response=moneyRequestRepository.findAllByRequesterWallet_AppUser_EmailId(emailId,pageable);

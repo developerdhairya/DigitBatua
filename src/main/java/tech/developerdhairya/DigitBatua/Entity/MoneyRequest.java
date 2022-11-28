@@ -1,9 +1,8 @@
 package tech.developerdhairya.DigitBatua.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.*;
-import tech.developerdhairya.DigitBatua.Util.MoneyRequestStatus;
+import tech.developerdhairya.DigitBatua.Enum.MoneyRequestStatus;
 
 import javax.persistence.*;
 import javax.persistence.Entity;

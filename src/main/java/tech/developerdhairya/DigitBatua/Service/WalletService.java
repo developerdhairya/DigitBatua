@@ -2,11 +2,14 @@ package tech.developerdhairya.DigitBatua.Service;
 
 import com.razorpay.PaymentLink;
 import com.razorpay.RazorpayException;
-import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tech.developerdhairya.DigitBatua.DTO.FundWalletResponse;
+import tech.developerdhairya.DigitBatua.DTO.FundingFilteredResponse;
 import tech.developerdhairya.DigitBatua.Entity.AppUser;
 import tech.developerdhairya.DigitBatua.Entity.Funding;
 import tech.developerdhairya.DigitBatua.Entity.Wallet;
@@ -18,8 +21,9 @@ import tech.developerdhairya.DigitBatua.Repository.AppUserRepository;
 import tech.developerdhairya.DigitBatua.Repository.FundingRepository;
 import tech.developerdhairya.DigitBatua.Repository.WalletRepository;
 import tech.developerdhairya.DigitBatua.Util.AuthenticationUtil;
-import tech.developerdhairya.DigitBatua.Util.FundingStatus;
+import tech.developerdhairya.DigitBatua.Enum.FundingStatus;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -99,12 +103,17 @@ public class WalletService {
         }
         Wallet wallet=funding.get().getWallet();
         wallet.setBalance(wallet.getBalance()+funding.get().getAmount());
-        System.out.println(2);
         walletRepository.save(wallet);
         funding.get().setStatus(FundingStatus.Successful.name());
-        System.out.println(1);
         fundingRepository.save(funding.get());
-        System.out.println(3);
+    }
+
+    public List<FundingFilteredResponse> getAllFundings(String emailId,Integer pageNumber,Integer pageSize){
+        Pageable pageable =
+                PageRequest.of(pageNumber,pageSize, Sort.by("updateTimestamp").descending());
+        List<Funding> list=fundingRepository.findAllByWallet_AppUser_EmailId(emailId,pageable);
+        return FundingFilteredResponse.filterList(list);
+
     }
 
 }

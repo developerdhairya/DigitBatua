@@ -4,7 +4,7 @@ package tech.developerdhairya.DigitBatua.Entity;
 import lombok.*;
 import org.hibernate.annotations.*;
 import org.hibernate.validator.constraints.URL;
-import tech.developerdhairya.DigitBatua.Util.FundingStatus;
+import tech.developerdhairya.DigitBatua.Enum.FundingStatus;
 
 import javax.persistence.*;
 import javax.persistence.Entity;

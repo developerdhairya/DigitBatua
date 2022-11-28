@@ -7,17 +7,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import tech.developerdhairya.DigitBatua.DTO.*;
 import tech.developerdhairya.DigitBatua.Entity.Wallet;
+import tech.developerdhairya.DigitBatua.Enum.TransactionType;
 import tech.developerdhairya.DigitBatua.Exception.BadRequestException;
 import tech.developerdhairya.DigitBatua.Exception.ForbiddenException;
 import tech.developerdhairya.DigitBatua.Exception.NotFoundException;
 import tech.developerdhairya.DigitBatua.Exception.PaymentRequiredException;
 import tech.developerdhairya.DigitBatua.Service.TransactionService;
 import tech.developerdhairya.DigitBatua.Service.WalletService;
-import tech.developerdhairya.DigitBatua.Util.TransactionType;
 
 import javax.validation.Valid;
+import java.util.List;
 
-@RestController()
+@RestController
 @RequestMapping("/wallet")
 public class WalletController {
 
@@ -37,7 +38,7 @@ public class WalletController {
             return ResponseHandler.generateErrorResponse(HttpStatus.BAD_REQUEST, e.getLocalizedMessage());
         } catch (ForbiddenException e) {
             return ResponseHandler.generateErrorResponse(HttpStatus.FORBIDDEN, e.getLocalizedMessage());
-        }catch (Exception e) {
+        } catch (Exception e) {
             return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong!");
         }
     }
@@ -50,12 +51,10 @@ public class WalletController {
             return ResponseHandler.generateSuccessResponse(wallet, HttpStatus.CREATED);
         } catch (NotFoundException e) {
             return ResponseHandler.generateErrorResponse(HttpStatus.NOT_FOUND, e.getLocalizedMessage());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong!");
         }
     }
-
 
 
     @PostMapping("/fund")
@@ -71,6 +70,18 @@ public class WalletController {
             return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong!");
         }
     }
+
+    @GetMapping("/funding")
+    public ResponseEntity<Object> getAllFunding(@RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
+        try {
+            String emailId = SecurityContextHolder.getContext().getAuthentication().getName();
+            List<FundingFilteredResponse> response = walletService.getAllFundings(emailId, pageNumber, pageSize);
+            return ResponseHandler.generateSuccessResponse(response, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong!");
+        }
+    }
+
 
     @GetMapping("/funding/verify")
     public ResponseEntity<Object> verifyFundingStatus(@RequestParam String fundingId) {
@@ -142,25 +153,28 @@ public class WalletController {
     }
 
     @GetMapping("/getReceivedMoneyRequests")
-    public ResponseEntity<Object> getReceivedMoneyRequests(@RequestParam Integer pageNumber,@RequestParam Integer pageSize){
-        try{
+    public ResponseEntity<Object> getReceivedMoneyRequests(@RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
+        try {
             String emailId = SecurityContextHolder.getContext().getAuthentication().getName();
-            return ResponseHandler.generateSuccessResponse(transactionService.getAllReceivedMoneyRequests(emailId,pageNumber,pageSize), HttpStatus.OK);
-        }catch (Exception e) {
+            return ResponseHandler.generateSuccessResponse(transactionService.getAllReceivedMoneyRequests(emailId, pageNumber, pageSize), HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println(e);
             return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Something Went Wrong!");
         }
     }
 
     @GetMapping("/getSentMoneyRequests")
-    public ResponseEntity<Object> getSentMoneyRequests(@RequestParam Integer pageNumber,@RequestParam Integer pageSize){
-        try{
+    public ResponseEntity<Object> getSentMoneyRequests(@RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
+        try {
             String emailId = SecurityContextHolder.getContext().getAuthentication().getName();
-            return ResponseHandler.generateSuccessResponse(transactionService.getAllSentMoneyRequests(emailId,pageNumber,pageSize), HttpStatus.OK);
-        }catch (Exception e) {
+            return ResponseHandler.generateSuccessResponse(transactionService.getAllSentMoneyRequests(emailId, pageNumber, pageSize), HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return ResponseHandler.generateErrorResponse(HttpStatus.BAD_REQUEST, e.getLocalizedMessage());
+        } catch (Exception e) {
+            System.out.println(e);
             return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Something Went Wrong!");
         }
     }
-
 
 
 }

@@ -1,6 +1,5 @@
 package tech.developerdhairya.DigitBatua.Controller;
 
-import com.razorpay.RazorpayException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -18,9 +17,7 @@ import tech.developerdhairya.DigitBatua.Exception.BadRequestException;
 import tech.developerdhairya.DigitBatua.Exception.NotAcceptableException;
 import tech.developerdhairya.DigitBatua.Exception.UnauthorizedException;
 import tech.developerdhairya.DigitBatua.Service.AppUserService;
-import tech.developerdhairya.DigitBatua.Service.PaymentService;
 import tech.developerdhairya.DigitBatua.Service.UserDetailsServiceImpl;
-import tech.developerdhairya.DigitBatua.Util.AuthenticationUtil;
 import tech.developerdhairya.DigitBatua.Util.JWTUtil;
 
 import javax.validation.Valid;
@@ -42,9 +39,6 @@ public class AppUserController {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsServiceImpl;
-
-    @Autowired
-    private PaymentService paymentService;
 
 
     @PostMapping("/register")
@@ -83,7 +77,6 @@ public class AppUserController {
         } catch (NotAcceptableException e) {
             return ResponseHandler.generateErrorResponse(HttpStatus.NOT_ACCEPTABLE, e.getLocalizedMessage());
         } catch (Exception e) {
-            System.out.println(e);
             return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong!");
         }
     }
@@ -98,7 +91,6 @@ public class AppUserController {
         } catch (BadRequestException e) {
             return ResponseHandler.generateErrorResponse(HttpStatus.BAD_REQUEST, e.getLocalizedMessage());
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong!");
         }
     }
@@ -116,7 +108,7 @@ public class AppUserController {
     }
 
     @PutMapping("/resetPasswordByToken")
-    public ResponseEntity<Object> resetPasswordByToken(@RequestBody ResetPasswordByTokenDTO tokenDTO){
+    public ResponseEntity<Object> resetPasswordByToken(@RequestBody ResetPasswordByTokenDTO tokenDTO) {
         try {
             appUserService.resetForgottenPassword(tokenDTO);
             return ResponseHandler.generateSuccessResponse(null, HttpStatus.OK);
@@ -133,13 +125,9 @@ public class AppUserController {
     @PostMapping("/login")
     public ResponseEntity<Object> authenticate(@NotNull @RequestBody JWTRequest jwtRequest) {
         try {
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    jwtRequest.getEmailId(),
-                    jwtRequest.getPassword()
-            );
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(jwtRequest.getEmailId(), jwtRequest.getPassword());
             authenticationManager.authenticate(authenticationToken);
-            UserDetails userDetails
-                    = userDetailsServiceImpl.loadUserByUsername(jwtRequest.getEmailId());
+            UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(jwtRequest.getEmailId());
             String jwtToken = jwtUtil.generateToken(userDetails);
             return ResponseHandler.generateSuccessResponse(new JWTResponse(jwtToken), HttpStatus.OK);
         } catch (BadCredentialsException e) {
@@ -155,11 +143,11 @@ public class AppUserController {
     @GetMapping("/getByEmailId")
     public ResponseEntity<Object> getUserByEmailId(@RequestParam String emailId) {
         try {
-            GetUserResponse responseData=appUserService.getUserByEmailId(emailId);
-            return ResponseHandler.generateSuccessResponse(responseData,HttpStatus.OK);
-        }catch (BadRequestException e) {
+            GetUserResponse responseData = appUserService.getUserByEmailId(emailId);
+            return ResponseHandler.generateSuccessResponse(responseData, HttpStatus.OK);
+        } catch (BadRequestException e) {
             e.printStackTrace();
-            return  ResponseHandler.generateErrorResponse(HttpStatus.BAD_REQUEST,e.getLocalizedMessage());
+            return ResponseHandler.generateErrorResponse(HttpStatus.BAD_REQUEST, e.getLocalizedMessage());
         }
     }
 
