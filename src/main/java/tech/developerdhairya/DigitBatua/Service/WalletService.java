@@ -18,6 +18,7 @@ import tech.developerdhairya.DigitBatua.Repository.AppUserRepository;
 import tech.developerdhairya.DigitBatua.Repository.FundingRepository;
 import tech.developerdhairya.DigitBatua.Repository.WalletRepository;
 import tech.developerdhairya.DigitBatua.Util.AuthenticationUtil;
+import tech.developerdhairya.DigitBatua.Util.FundingStatus;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -88,6 +89,9 @@ public class WalletService {
         if(funding.isEmpty()){
             throw new BadRequestException("Invalid Funding ID");
         }
+        if(!funding.get().getStatus().equals(FundingStatus.Pending)){
+            throw new BadRequestException("The funding request is already "+funding.get().getStatus());
+        }
         String paymentId=funding.get().getRzpPaymentId();
         boolean isVerified=paymentService.verifyPayment(paymentId,funding.get().getAmount());
         if(!isVerified){
@@ -95,9 +99,12 @@ public class WalletService {
         }
         Wallet wallet=funding.get().getWallet();
         wallet.setBalance(wallet.getBalance()+funding.get().getAmount());
+        System.out.println(2);
         walletRepository.save(wallet);
-        funding.get().setStatus("success");
+        funding.get().setStatus(FundingStatus.Successful.name());
+        System.out.println(1);
         fundingRepository.save(funding.get());
+        System.out.println(3);
     }
 
 }
