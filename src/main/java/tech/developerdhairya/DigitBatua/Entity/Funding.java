@@ -2,14 +2,17 @@ package tech.developerdhairya.DigitBatua.Entity;
 
 
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.*;
 import org.hibernate.validator.constraints.URL;
+import tech.developerdhairya.DigitBatua.Util.FundingStatus;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -18,6 +21,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @ToString
+@DynamicUpdate
 public class Funding {
 
     @Id
@@ -43,7 +47,12 @@ public class Funding {
     private String rzpPaymentLink;
 
     @NotBlank @NotNull
-    private String status="pending";
+    private String status= FundingStatus.Pending.name();
 
+    @CreationTimestamp
+    private Timestamp creationTimestamp = Timestamp.valueOf(LocalDateTime.now());
+
+    @UpdateTimestamp
+    private Timestamp updateTimestamp;
 
 }
