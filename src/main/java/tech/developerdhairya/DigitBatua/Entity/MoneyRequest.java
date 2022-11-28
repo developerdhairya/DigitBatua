@@ -2,13 +2,16 @@ package tech.developerdhairya.DigitBatua.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.*;
+import tech.developerdhairya.DigitBatua.Util.MoneyRequestStatus;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -17,6 +20,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
+@DynamicUpdate
 public class MoneyRequest {
 
     @Id
@@ -39,9 +43,15 @@ public class MoneyRequest {
     private Integer amount;
 
     @NotBlank @NotNull
-    private String status="Pending";
+    private String status= MoneyRequestStatus.Pending.name();
 
     private String message;
+
+    @CreationTimestamp
+    private Timestamp creationTimestamp = Timestamp.valueOf(LocalDateTime.now());
+
+    @UpdateTimestamp
+    private Timestamp updateTimestamp;
 
 
 }
