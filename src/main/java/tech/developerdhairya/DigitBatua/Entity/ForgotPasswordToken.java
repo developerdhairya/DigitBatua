@@ -1,9 +1,14 @@
 package tech.developerdhairya.DigitBatua.Entity;
 
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 import tech.developerdhairya.DigitBatua.Util.AuthenticationUtil;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -12,6 +17,7 @@ import java.util.Date;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor
+@DynamicUpdate
 public class ForgotPasswordToken implements Token{
 
     public ForgotPasswordToken(String token, AppUser appUser) {
@@ -32,6 +38,12 @@ public class ForgotPasswordToken implements Token{
     @JoinColumn(name = "user_id",nullable = false)
     @ToString.Exclude
     private AppUser appUser;
+
+    @CreationTimestamp
+    private Timestamp creationTimestamp = Timestamp.valueOf(LocalDateTime.now());
+
+    @UpdateTimestamp
+    private Timestamp updateTimestamp;
 
 }
 
