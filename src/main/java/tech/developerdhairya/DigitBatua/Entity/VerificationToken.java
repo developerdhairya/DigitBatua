@@ -3,9 +3,14 @@ package tech.developerdhairya.DigitBatua.Entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 import tech.developerdhairya.DigitBatua.Util.AuthenticationUtil;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Objects;
 
@@ -15,6 +20,7 @@ import java.util.Objects;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor
+@DynamicUpdate
 public class VerificationToken implements Token{
     public VerificationToken(String token, AppUser appUser) {
         this.token = token;
@@ -34,6 +40,12 @@ public class VerificationToken implements Token{
     @JoinColumn(name = "user_id",nullable = false)
     @ToString.Exclude
     private AppUser appUser;
+
+    @CreationTimestamp
+    private Timestamp creationTimestamp = Timestamp.valueOf(LocalDateTime.now());
+
+    @UpdateTimestamp
+    private Timestamp updateTimestamp;
 
 
 
