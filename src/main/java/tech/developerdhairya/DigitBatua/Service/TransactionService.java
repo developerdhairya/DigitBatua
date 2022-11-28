@@ -1,10 +1,14 @@
 package tech.developerdhairya.DigitBatua.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tech.developerdhairya.DigitBatua.DTO.MoneyRequestDTO;
+import tech.developerdhairya.DigitBatua.DTO.MoneyRequestFilteredResponse;
 import tech.developerdhairya.DigitBatua.DTO.SendMoneyDTO;
 import tech.developerdhairya.DigitBatua.Entity.MoneyRequest;
 import tech.developerdhairya.DigitBatua.Entity.Transaction;
@@ -65,7 +69,7 @@ public class TransactionService {
         return senderWallet;
     }
 
-    public MoneyRequest requestMoney(MoneyRequestDTO dto) throws BadRequestException {
+    public MoneyRequestFilteredResponse requestMoney(MoneyRequestDTO dto) throws BadRequestException {
         String requesterEmailId = SecurityContextHolder.getContext().getAuthentication().getName();
         if (requesterEmailId.equals(dto.getRequestReceiverEmailId())) {
             throw new BadRequestException("Cant request money from your own wallet.");
@@ -83,7 +87,8 @@ public class TransactionService {
         moneyRequest.setRequestReceiverWallet(requestReceiverWallet);
         moneyRequest.setAmount(dto.getAmount());
         moneyRequest.setStatus(MoneyRequestStatus.Pending.toString());
-        return moneyRequestRepository.save(moneyRequest);
+        MoneyRequest response=moneyRequestRepository.save(moneyRequest);
+        return new MoneyRequestFilteredResponse(response);
     }
 
     @Transactional
@@ -126,13 +131,20 @@ public class TransactionService {
         return null;
     }
 
+//add pagination
 
-    public List<MoneyRequest> getAllReceivedMoneyRequests(String emailId) {
-        return moneyRequestRepository.findAllByRequestReceiverWallet_AppUser_EmailId(emailId);
+    public List<MoneyRequestFilteredResponse> getAllReceivedMoneyRequests(String emailId,Integer pageNumber,Integer pageSize ) {
+        Pageable pageable =
+                PageRequest.of(pageNumber,pageSize, Sort.by("updateTimestamp").descending());
+        List<MoneyRequest> response=moneyRequestRepository.findAllByRequestReceiverWallet_AppUser_EmailId(emailId,pageable);
+        return MoneyRequestFilteredResponse.filterList(response);
     }
 
-    public List<MoneyRequest> getAllSentMoneyRequests(String emailId) {
-        return moneyRequestRepository.findAllByRequesterWallet_AppUser_EmailId(emailId);
+    public List<MoneyRequestFilteredResponse> getAllSentMoneyRequests(String emailId,Integer pageNumber,Integer pageSize) {
+        Pageable pageable =
+                PageRequest.of(pageNumber,pageSize, Sort.by("updateTimestamp").descending());
+        List<MoneyRequest> response=moneyRequestRepository.findAllByRequesterWallet_AppUser_EmailId(emailId,pageable);
+        return MoneyRequestFilteredResponse.filterList(response);
     }
 
 }
