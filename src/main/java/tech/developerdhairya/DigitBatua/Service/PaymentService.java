@@ -48,7 +48,7 @@ public class PaymentService {
         JSONObject notes = new JSONObject();
 //        notes.put("null","null");
         paymentLinkRequest.put("notes",notes);
-        paymentLinkRequest.put("callback_url","http://localhost:4601/wallet/funding/verify?fundingId="+ref_id);
+        paymentLinkRequest.put("callback_url","https://aws.developerdhairya.tech/DigitBatua/wallet/funding/verify?fundingId="+ref_id);
         paymentLinkRequest.put("callback_method","get");
         return razorpay.paymentLink.create(paymentLinkRequest);
     }
