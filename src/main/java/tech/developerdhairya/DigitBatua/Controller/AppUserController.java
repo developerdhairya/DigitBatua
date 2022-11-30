@@ -30,7 +30,6 @@ public class AppUserController {
     @Autowired
     private AppUserService appUserService;
 
-
     @Autowired
     private AuthenticationManager authenticationManager;
 
