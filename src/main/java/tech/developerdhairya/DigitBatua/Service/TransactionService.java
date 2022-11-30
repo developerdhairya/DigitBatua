@@ -39,7 +39,7 @@ public class TransactionService {
     @Autowired
     private MoneyRequestRepository moneyRequestRepository;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Wallet sendMoney(SendMoneyDTO sendMoneyDTO, TransactionType transactionType) throws BadRequestException, PaymentRequiredException {
         String senderEmailId = SecurityContextHolder.getContext().getAuthentication().getName();
         if (senderEmailId.equals(sendMoneyDTO.getReceiverEmailId())) {
@@ -113,7 +113,7 @@ public class TransactionService {
         return sendMoney(sendMoneyDTO, TransactionType.RequestTransfer);
     }
 
-    @Transactional
+
     public Object declineMoneyRequest(String requestId) throws BadRequestException, ForbiddenException, PaymentRequiredException {
         Optional<MoneyRequest> moneyRequest = moneyRequestRepository.findById(UUID.fromString(requestId));
         if (moneyRequest.isEmpty()) {
@@ -140,8 +140,7 @@ public class TransactionService {
     }
 
     public List<MoneyRequestFilteredResponse> getAllSentMoneyRequests(String emailId,Integer pageNumber,Integer pageSize) throws IllegalArgumentException{
-        Pageable pageable =
-                PageRequest.of(pageNumber,pageSize, Sort.by("updateTimestamp").descending());
+        Pageable pageable =PageRequest.of(pageNumber,pageSize, Sort.by("updateTimestamp").descending());
         List<MoneyRequest> response=moneyRequestRepository.findAllByRequesterWallet_AppUser_EmailId(emailId,pageable);
         return MoneyRequestFilteredResponse.filterList(response);
     }
