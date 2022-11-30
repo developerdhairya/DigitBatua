@@ -87,13 +87,13 @@ public class WalletService {
         return new FundWalletResponse(paymentLink.get("short_url"));
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void verifyFunding(String fundingId) throws BadRequestException, RazorpayException, PaymentRequiredException {
         Optional<Funding> funding=fundingRepository.findById(UUID.fromString(fundingId));
         if(funding.isEmpty()){
             throw new BadRequestException("Invalid Funding ID");
         }
-        if(!funding.get().getStatus().equals(FundingStatus.Pending)){
+        if(!funding.get().getStatus().equals(FundingStatus.Pending.name())){
             throw new BadRequestException("The funding request is already "+funding.get().getStatus());
         }
         String paymentId=funding.get().getRzpPaymentId();
@@ -113,7 +113,6 @@ public class WalletService {
                 PageRequest.of(pageNumber,pageSize, Sort.by("updateTimestamp").descending());
         List<Funding> list=fundingRepository.findAllByWallet_AppUser_EmailId(emailId,pageable);
         return FundingFilteredResponse.filterList(list);
-
     }
 
 }
