@@ -4,18 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class MoneyRequestDTO {
-    @Email @NotNull
+    @NotBlank @NotEmpty  @Email
     String requestReceiverEmailId;
 
-    @Min(value = 1,message = "You can't request amount less than Rs.1")
+    @NotNull @Min(value = 1,message = "You can't request amount less than Rs.1")
     private Integer amount;
 
     private String message;
