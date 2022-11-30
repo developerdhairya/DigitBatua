@@ -45,7 +45,7 @@ public class AppUserService {
     private MailerService mailerService;
 
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public AppUser registerUser(RegisterUserDTO registerUserDTO) throws DataIntegrityViolationException {
         String password = registerUserDTO.getPassword();
         String encodedPassword = passwordEncoder.encode(password);
@@ -56,10 +56,11 @@ public class AppUserService {
         appUser.setMobileNumber(registerUserDTO.getMobileNumber());
         appUser.setRole("USER");
         appUser.setPassword(encodedPassword);
-        userRepository.save(appUser);
+        AppUser x=userRepository.saveAndFlush(appUser); // using save() sends email even if DataIntegrityVoilation takes place.
         String token=UUID.randomUUID().toString();
         VerificationToken verificationToken=new VerificationToken(token, appUser);
         verificationTokenRepository.save(verificationToken);
+        System.out.println(x);
         mailerService.sendVerificationToken(registerUserDTO.getEmailId(),token);
         return appUser;
     }
@@ -67,8 +68,8 @@ public class AppUserService {
 
 
     //enable user
+    @Transactional(rollbackFor = Exception.class)
     public void validateVerificationToken(String token) throws BadRequestException, UnauthorizedException {
-        System.out.println(token);
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token);
         if (verificationToken == null) {
             throw new BadRequestException("Invalid token");
@@ -82,7 +83,7 @@ public class AppUserService {
         verificationTokenRepository.delete(verificationToken);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void resendVerificationToken(String emailId) throws NotAcceptableException {
         AppUser appUser = userRepository.findByEmailId(emailId);
         if (appUser.isVerified()) {
@@ -101,7 +102,7 @@ public class AppUserService {
         mailerService.sendVerificationToken(emailId,emailBody);
     }
 
-    @Transactional
+
     public void sendForgotPasswordToken(String emailId) throws BadRequestException {
         AppUser appUser = userRepository.findByEmailId(emailId);
         if(appUser==null){
@@ -113,7 +114,7 @@ public class AppUserService {
         mailerService.sendForgotPasswordToken(emailId,tokenBody);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void resetForgottenPassword(ResetPasswordByTokenDTO tokenDTO) throws BadRequestException, UnauthorizedException {
         if(!tokenDTO.getNewPassword().equals(tokenDTO.getConfirmNewPassword())){
             throw new BadRequestException("Passwords don't match");
