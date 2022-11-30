@@ -25,7 +25,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private JWTFilter jwtFilter;
 
-    private String[] whitelistedRoutes=new String[]{"/register", "/login","/verifyRegistration","/getByEmailId","/wallet/funding/verify","/forgotPassword","/resetPasswordByToken"};
+    private String[] whitelistedRoutes=new String[]{"/register", "/login","/verifyRegistration","/getByEmailId","/wallet/funding/verify","/forgotPassword","/resetPasswordByToken","/v3/api-docs/","/swagger-ui.html","/swagger-ui/index.html"};
 
     @Override
     public void configure(HttpSecurity security) throws Exception {
