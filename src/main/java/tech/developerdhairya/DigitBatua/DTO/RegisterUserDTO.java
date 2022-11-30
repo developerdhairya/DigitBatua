@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 @Data
@@ -14,17 +14,23 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 public class RegisterUserDTO {
     @NotBlank
+    @NotEmpty
     @Size(min = 2, max = 20, message = "firstName should be between 2 and 20 characters")
     private String firstName;
     @NotBlank
+    @NotEmpty
     @Size(min = 2, max = 20, message = "lastName should be between 2 and 20 characters")
     private String lastName;
+    @NotBlank
+    @NotEmpty
     @Email
     private String emailId;
     @NotBlank
+    @NotEmpty
     @Size(min = 8, max = 30, message = "Password should be between 9 and 20 characters")
     private String password;
     @NotBlank
+    @NotEmpty
     @Size(min = 10, max = 13, message = "Invalid Mobile Number")
     private String mobileNumber;
 }
