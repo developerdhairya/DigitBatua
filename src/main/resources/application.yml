@@ -6,7 +6,7 @@ spring:
   datasource:
     username: root
     url: jdbc:mysql://35.224.143.131/DigitBatua
-    password: $F6Q2)=SiaXE\@U"
+    password: \~e`{(f3fZ2dY@YE
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -20,7 +20,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: taneja.dhairya12@gmail.com
-    password: etjobouraommwzmw
+    password: rigcsumvdetuspse
     properties:
       mail:
         smtp:
@@ -28,5 +28,5 @@ spring:
           starttls:
             enable: true
 razorpay:
-  key: rzp_test_NknysbAJul7cYG
-  secret: prcN6hwLfFIOjnALiaeghaAU
+  key: rzp_test_Eicpu76Fzod4OL
+  secret: QrDV7Deu4SWnb0PdocEGhR49
