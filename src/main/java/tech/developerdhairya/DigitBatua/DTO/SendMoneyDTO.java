@@ -8,6 +8,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import java.util.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,7 +19,7 @@ public class SendMoneyDTO {
     @NotEmpty
     @Email
     private String receiverEmailId;
-    @Min(value = 1,message = "You can't send amount less than Rs.1")
+    @Min(value = 100,message = "You can't send amount less than Rs.1")
     private Integer amount;
 
     private String message;

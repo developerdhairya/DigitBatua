@@ -53,7 +53,7 @@ public class AppUserController {
     }
 
     @PutMapping("/verifyRegistration")
-    public ResponseEntity<Object> verifyRegistration(@RequestBody VerifyRegistrationDTO verifyRegistrationDTO) {
+    public ResponseEntity<Object> verifyRegistration(@Valid @RequestBody VerifyRegistrationDTO verifyRegistrationDTO) {
         try {
             appUserService.validateVerificationToken(verifyRegistrationDTO.getToken());
             return ResponseHandler.generateSuccessResponse(null, HttpStatus.ACCEPTED);
@@ -81,7 +81,7 @@ public class AppUserController {
     }
 
     @PutMapping("/resetPassword")
-    public ResponseEntity<Object> resetPassword(@NotNull @RequestBody ChangePasswordDTO changePasswordDTO) {
+    public ResponseEntity<Object> resetPassword(@Valid @RequestBody ChangePasswordDTO changePasswordDTO) {
         try {
             appUserService.resetPassword(changePasswordDTO);
             return ResponseHandler.generateSuccessResponse(null, HttpStatus.OK);
@@ -107,7 +107,7 @@ public class AppUserController {
     }
 
     @PutMapping("/resetPasswordByToken")
-    public ResponseEntity<Object> resetPasswordByToken(@RequestBody ResetPasswordByTokenDTO tokenDTO) {
+    public ResponseEntity<Object> resetPasswordByToken(@Valid @RequestBody ResetPasswordByTokenDTO tokenDTO) {
         try {
             appUserService.resetForgottenPassword(tokenDTO);
             return ResponseHandler.generateSuccessResponse(null, HttpStatus.OK);
@@ -116,13 +116,14 @@ public class AppUserController {
         } catch (UnauthorizedException e) {
             return ResponseHandler.generateErrorResponse(HttpStatus.UNAUTHORIZED, e.getLocalizedMessage());
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong!");
         }
     }
 
 
     @PostMapping("/login")
-    public ResponseEntity<Object> authenticate(@NotNull @RequestBody JWTRequest jwtRequest) {
+    public ResponseEntity<Object> authenticate(@Valid @RequestBody JWTRequest jwtRequest) {
         try {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(jwtRequest.getEmailId(), jwtRequest.getPassword());
             authenticationManager.authenticate(authenticationToken);

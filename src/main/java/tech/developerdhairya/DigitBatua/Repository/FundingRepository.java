@@ -17,4 +17,7 @@ public interface FundingRepository extends PagingAndSortingRepository<Funding, U
     @Query("select f from Funding f where f.wallet.appUser.emailId = ?1")
     List<Funding> findAllByWallet_AppUser_EmailId(String emailId, Pageable pageable);
 
+    @Query("select f from Funding f where f.wallet.appUser.emailId = ?1 and f.status = ?2")
+    List<Funding> findAllByWallet_AppUser_EmailIdAndStatus(String emailId,String status,Pageable pageable);
+
 }

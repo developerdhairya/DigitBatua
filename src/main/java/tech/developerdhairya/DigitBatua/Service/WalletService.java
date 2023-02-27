@@ -13,6 +13,7 @@ import tech.developerdhairya.DigitBatua.DTO.FundingFilteredResponse;
 import tech.developerdhairya.DigitBatua.Entity.AppUser;
 import tech.developerdhairya.DigitBatua.Entity.Funding;
 import tech.developerdhairya.DigitBatua.Entity.Wallet;
+import tech.developerdhairya.DigitBatua.Enum.TransactionType;
 import tech.developerdhairya.DigitBatua.Exception.BadRequestException;
 import tech.developerdhairya.DigitBatua.Exception.ForbiddenException;
 import tech.developerdhairya.DigitBatua.Exception.NotFoundException;
@@ -108,10 +109,22 @@ public class WalletService {
         fundingRepository.save(funding.get());
     }
 
-    public List<FundingFilteredResponse> getAllFundings(String emailId,Integer pageNumber,Integer pageSize){
-        Pageable pageable =
-                PageRequest.of(pageNumber,pageSize, Sort.by("updateTimestamp").descending());
-        List<Funding> list=fundingRepository.findAllByWallet_AppUser_EmailId(emailId,pageable);
+    public List<FundingFilteredResponse> getAllFunding(String emailId, Integer pageNumber, Integer pageSize, Integer sort,String status) throws BadRequestException {
+        if(sort!=1 && sort!=-1){
+            throw new BadRequestException("Invalid sort parameter");
+        }
+        if (!status.equals(FundingStatus.Successful.name()) && !status.equals(FundingStatus.Pending.name()) && !status.equals("All")){
+            throw new BadRequestException("Invalid status parameter");
+        }
+        Sort sortCondition=Sort.by("updateTimestamp");
+        Sort sortParam=sort==-1?sortCondition.descending():sortCondition.ascending();
+        Pageable pageable =PageRequest.of(pageNumber,pageSize,sortParam);
+        List<Funding> list;
+        if (status.equals("All")){
+            list=fundingRepository.findAllByWallet_AppUser_EmailId(emailId,pageable);
+        }else {
+            list=fundingRepository.findAllByWallet_AppUser_EmailIdAndStatus(emailId,status,pageable);
+        }
         return FundingFilteredResponse.filterList(list);
     }
 

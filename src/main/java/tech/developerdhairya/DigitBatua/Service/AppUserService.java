@@ -129,12 +129,13 @@ public class AppUserService {
 
         AppUser appUser=token.getAppUser();
         forgotPasswordTokenRepository.delete(token);
+        System.out.println(1);
         if(!appUser.getEmailId().equals(tokenDTO.getEmailId())){
             throw new UnauthorizedException("Invalid Details");
         }
         String hashedPassword=passwordEncoder.encode(tokenDTO.getNewPassword());
         appUser.setPassword(hashedPassword);
-        userRepository.save(appUser);
+        userRepository.saveAndFlush(appUser);
     }
 
 

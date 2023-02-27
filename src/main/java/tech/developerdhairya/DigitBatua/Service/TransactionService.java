@@ -10,18 +10,19 @@ import org.springframework.transaction.annotation.Transactional;
 import tech.developerdhairya.DigitBatua.DTO.MoneyRequestDTO;
 import tech.developerdhairya.DigitBatua.DTO.MoneyRequestFilteredResponse;
 import tech.developerdhairya.DigitBatua.DTO.SendMoneyDTO;
+import tech.developerdhairya.DigitBatua.DTO.TransactionFilteredResponse;
 import tech.developerdhairya.DigitBatua.Entity.MoneyRequest;
 import tech.developerdhairya.DigitBatua.Entity.Transaction;
 import tech.developerdhairya.DigitBatua.Entity.Wallet;
+import tech.developerdhairya.DigitBatua.Enum.MoneyRequestStatus;
+import tech.developerdhairya.DigitBatua.Enum.TransactionStatus;
+import tech.developerdhairya.DigitBatua.Enum.TransactionType;
 import tech.developerdhairya.DigitBatua.Exception.BadRequestException;
 import tech.developerdhairya.DigitBatua.Exception.ForbiddenException;
 import tech.developerdhairya.DigitBatua.Exception.PaymentRequiredException;
 import tech.developerdhairya.DigitBatua.Repository.MoneyRequestRepository;
 import tech.developerdhairya.DigitBatua.Repository.TransactionRepository;
 import tech.developerdhairya.DigitBatua.Repository.WalletRepository;
-import tech.developerdhairya.DigitBatua.Enum.MoneyRequestStatus;
-import tech.developerdhairya.DigitBatua.Enum.TransactionStatus;
-import tech.developerdhairya.DigitBatua.Enum.TransactionType;
 
 import java.util.List;
 import java.util.Optional;
@@ -87,7 +88,7 @@ public class TransactionService {
         moneyRequest.setRequestReceiverWallet(requestReceiverWallet);
         moneyRequest.setAmount(dto.getAmount());
         moneyRequest.setStatus(MoneyRequestStatus.Pending.toString());
-        MoneyRequest response=moneyRequestRepository.save(moneyRequest);
+        MoneyRequest response = moneyRequestRepository.save(moneyRequest);
         return new MoneyRequestFilteredResponse(response);
     }
 
@@ -132,18 +133,47 @@ public class TransactionService {
     }
 
 
-    public List<MoneyRequestFilteredResponse> getAllReceivedMoneyRequests(String emailId,Integer pageNumber,Integer pageSize ) {
-        Pageable pageable =
-                PageRequest.of(pageNumber,pageSize, Sort.by("updateTimestamp").descending());
-        List<MoneyRequest> response=moneyRequestRepository.findAllByRequestReceiverWallet_AppUser_EmailId(emailId,pageable);
+    public List<MoneyRequestFilteredResponse> getReceivedMoneyRequests(String emailId, Integer pageNumber, Integer pageSize, Integer sort) throws BadRequestException {
+        if (sort != 1 && sort != -1) {
+            throw new BadRequestException("Invalid sort parameter");
+        }
+        Sort sortCondition = Sort.by("updateTimestamp");
+        Sort sortParam = sort == -1 ? sortCondition.descending() : sortCondition.ascending();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sortParam);
+        List<MoneyRequest> response = moneyRequestRepository.findAllByRequestReceiverWallet_AppUser_EmailId(emailId, pageable);
         return MoneyRequestFilteredResponse.filterList(response);
     }
 
-    public List<MoneyRequestFilteredResponse> getAllSentMoneyRequests(String emailId,Integer pageNumber,Integer pageSize) throws IllegalArgumentException{
-        Pageable pageable =PageRequest.of(pageNumber,pageSize, Sort.by("updateTimestamp").descending());
-        List<MoneyRequest> response=moneyRequestRepository.findAllByRequesterWallet_AppUser_EmailId(emailId,pageable);
+    public List<MoneyRequestFilteredResponse> getSentMoneyRequests(String emailId, Integer pageNumber, Integer pageSize, Integer sort) throws IllegalArgumentException, BadRequestException {
+        if (sort != 1 && sort != -1) {
+            throw new BadRequestException("Invalid sort parameter");
+        }
+        Sort sortCondition = Sort.by("updateTimestamp");
+        Sort sortParam = sort == -1 ? sortCondition.descending() : sortCondition.ascending();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sortParam);
+        List<MoneyRequest> response = moneyRequestRepository.findAllByRequesterWallet_AppUser_EmailId(emailId, pageable);
         return MoneyRequestFilteredResponse.filterList(response);
     }
 
+    public List<TransactionFilteredResponse> getTransactionHistory(String emailId, Integer pageNumber, Integer pageSize, String type, Integer sort) throws BadRequestException {
+        if (sort != 1 && sort != -1) {
+            throw new BadRequestException("Invalid sort parameter");
+        }
+        if (!type.equals(TransactionType.RequestTransfer.name()) && !type.equals(TransactionType.DirectTransfer.name()) && !type.equals("All")) {
+            throw new BadRequestException("Invalid type parameter");
+        }
+        Sort sortCondition = Sort.by("updateTimestamp");
+        Sort sortParam = sort == -1 ? sortCondition.descending() : sortCondition.ascending();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sortParam);
+        System.out.println(pageable);
+        List<Transaction> response;
+        if (type.equals("All")) {
+            response = transactionRepository.getAllByTo_AppUser_EmailId_OrFrom_AppUser_EmailId(emailId,emailId,pageable);
+        } else {
+            response = transactionRepository.getAllByTo_AppUser_EmailId_OrFrom_AppUser_EmailIdAndType(emailId,emailId,type,pageable);
+        }
+        System.out.println(response);
+        return TransactionFilteredResponse.filterList(response);
+    }
 }
 

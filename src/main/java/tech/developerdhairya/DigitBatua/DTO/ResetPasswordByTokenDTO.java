@@ -10,7 +10,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Data
 public class ResetPasswordByTokenDTO {
 

@@ -1,0 +1,32 @@
+server:
+  port: 4601
+
+
+spring:
+  datasource:
+    username: root
+    url: jdbc:mysql://35.224.143.131/DigitBatua
+    password: $F6Q2)=SiaXE\@U"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL57InnoDBDialect
+        format_sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: taneja.dhairya12@gmail.com
+    password: etjobouraommwzmw
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+razorpay:
+  key: rzp_test_NknysbAJul7cYG
+  secret: prcN6hwLfFIOjnALiaeghaAU
