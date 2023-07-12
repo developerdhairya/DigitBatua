@@ -50,8 +50,8 @@ public class MailerService {
         try{
             SimpleMailMessage msg = new SimpleMailMessage();
             msg.setTo(recipient);
-            msg.setSubject("DigitBatua");
-            msg.setText("Thanks for testing my project.Your unique Forgot code is"+token+". It is valid for 10 minutes only");
+            msg.setSubject("DigitBatua (Forgot Password)");
+            msg.setText("Thanks for testing my project.Your unique code is "+token+". It is valid for 10 minutes only");
             javaMailSender.send(msg);
             System.out.println("Mail sent Successfully");
         }catch (Exception e){

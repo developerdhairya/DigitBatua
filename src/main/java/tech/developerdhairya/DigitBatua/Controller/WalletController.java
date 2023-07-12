@@ -50,7 +50,7 @@ public class WalletController {
         try {
             String emailId = SecurityContextHolder.getContext().getAuthentication().getName();
             Wallet wallet = walletService.getWalletDetails(emailId);
-            return ResponseHandler.generateSuccessResponse(wallet, HttpStatus.CREATED);
+            return ResponseHandler.generateSuccessResponse(wallet, HttpStatus.OK);
         } catch (NotFoundException e) {
             return ResponseHandler.generateErrorResponse(HttpStatus.NOT_FOUND, e.getLocalizedMessage());
         } catch (Exception e) {

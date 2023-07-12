@@ -46,6 +46,7 @@ public class WalletService {
     @Autowired
     private AuthenticationUtil authenticationUtil;
 
+    // Make a new entry in wallet table
     public Wallet activateWallet(String emailId) throws BadRequestException, ForbiddenException {
         AppUser appUser=appUserRepository.findByEmailId(emailId);
         if(!appUser.isVerified()){

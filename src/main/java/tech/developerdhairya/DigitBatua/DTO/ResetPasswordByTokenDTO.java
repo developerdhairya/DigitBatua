@@ -13,16 +13,16 @@ import javax.validation.constraints.Size;
 @Data
 public class ResetPasswordByTokenDTO {
 
-    @Email @NotBlank @NotEmpty
+    @Email @NotEmpty
     String emailId;
 
-    @NotBlank @NotEmpty
+    @NotEmpty
     String token;
 
-    @NotBlank @NotEmpty @Size(min = 8, max = 30, message = "Password should be between 9 and 20 characters")
+    @NotEmpty @Size(min = 8, max = 30, message = "Password should be between 8 and 20 characters")
     String newPassword;
 
-    @NotBlank @NotEmpty @Size(min = 8, max = 30, message = "Password should be between 9 and 20 characters")
+    @NotEmpty @Size(min = 8, max = 30, message = "Password should be between 8 and 20 characters")
     String confirmNewPassword;
 
 }

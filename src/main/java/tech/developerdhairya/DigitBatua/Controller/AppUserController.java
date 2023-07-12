@@ -21,7 +21,6 @@ import tech.developerdhairya.DigitBatua.Service.UserDetailsServiceImpl;
 import tech.developerdhairya.DigitBatua.Util.JWTUtil;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 
 @RestController
@@ -70,12 +69,14 @@ public class AppUserController {
     @GetMapping("/resendVerificationToken")
     public ResponseEntity<Object> resendVerificationToken() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println(email);
         try {
             appUserService.resendVerificationToken(email);
             return ResponseHandler.generateSuccessResponse(null, HttpStatus.ACCEPTED);
         } catch (NotAcceptableException e) {
             return ResponseHandler.generateErrorResponse(HttpStatus.NOT_ACCEPTABLE, e.getLocalizedMessage());
         } catch (Exception e) {
+            System.out.println(e);
             return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong!");
         }
     }
@@ -130,10 +131,8 @@ public class AppUserController {
             UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(jwtRequest.getEmailId());
             String jwtToken = jwtUtil.generateToken(userDetails);
             return ResponseHandler.generateSuccessResponse(new JWTResponse(jwtToken), HttpStatus.OK);
-        } catch (BadCredentialsException e) {
+        } catch (BadCredentialsException | UsernameNotFoundException e) {
             return ResponseHandler.generateErrorResponse(HttpStatus.UNAUTHORIZED, e.getLocalizedMessage());
-        } catch (UsernameNotFoundException e) {
-            return ResponseHandler.generateErrorResponse(HttpStatus.NOT_FOUND, e.getLocalizedMessage());
         } catch (Exception e) {
             return ResponseHandler.generateErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong!");
         }

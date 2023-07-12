@@ -41,7 +41,7 @@ public class MoneyRequest {
     @Column(nullable = false)
     private Integer amount;
 
-    @NotBlank @NotNull
+    @NotBlank
     private String status= MoneyRequestStatus.Pending.name();
 
     private String message;

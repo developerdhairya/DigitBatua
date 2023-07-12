@@ -36,9 +36,6 @@ public class AppUserService {
     private ForgotPasswordTokenRepository forgotPasswordTokenRepository;
 
     @Autowired
-    private AuthenticationUtil util;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -59,8 +56,7 @@ public class AppUserService {
         AppUser x=userRepository.saveAndFlush(appUser); // using save() sends email even if DataIntegrityVoilation takes place.
         String token=UUID.randomUUID().toString();
         VerificationToken verificationToken=new VerificationToken(token, appUser);
-        verificationTokenRepository.save(verificationToken);
-        System.out.println(x);
+        verificationTokenRepository.saveAndFlush(verificationToken);
         mailerService.sendVerificationToken(registerUserDTO.getEmailId(),token);
         return appUser;
     }
@@ -74,7 +70,7 @@ public class AppUserService {
         if (verificationToken == null) {
             throw new BadRequestException("Invalid token");
         }
-        if (util.checkTokenExpiry(verificationToken)) {
+        if (AuthenticationUtil.checkTokenExpiry(verificationToken)) {
             throw new UnauthorizedException("Token Expired");
         }
         AppUser appUser = verificationToken.getAppUser();
@@ -89,20 +85,20 @@ public class AppUserService {
         if (appUser.isVerified()) {
            throw new NotAcceptableException("User has already been verified");
         }
-        String emailBody;
+        String tokenBody;
         VerificationToken token = verificationTokenRepository.findByAppUser(appUser);
-        if (util.checkTokenExpiry(token)) {
+        if (AuthenticationUtil.checkTokenExpiry(token)) {
             verificationTokenRepository.delete(token);
-            emailBody=UUID.randomUUID().toString();
-            VerificationToken newToken = new VerificationToken(emailBody, appUser);
+            tokenBody=UUID.randomUUID().toString();
+            VerificationToken newToken = new VerificationToken(tokenBody, appUser);
             verificationTokenRepository.save(newToken);
         }else{
-            emailBody=token.getToken();
+            tokenBody=token.getToken();
         }
-        mailerService.sendVerificationToken(emailId,emailBody);
+        mailerService.sendVerificationToken(emailId,tokenBody);
     }
 
-
+    @Transactional(rollbackFor = Exception.class)
     public void sendForgotPasswordToken(String emailId) throws BadRequestException {
         AppUser appUser = userRepository.findByEmailId(emailId);
         if(appUser==null){
@@ -123,13 +119,12 @@ public class AppUserService {
         if(token==null){
             throw new BadRequestException("Invalid Token");
         }
-        if(util.checkTokenExpiry(token)){
+        if(AuthenticationUtil.checkTokenExpiry(token)){
             throw new UnauthorizedException("Token Expired");
         }
 
         AppUser appUser=token.getAppUser();
         forgotPasswordTokenRepository.delete(token);
-        System.out.println(1);
         if(!appUser.getEmailId().equals(tokenDTO.getEmailId())){
             throw new UnauthorizedException("Invalid Details");
         }

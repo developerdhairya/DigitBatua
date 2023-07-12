@@ -22,8 +22,6 @@ public class PaymentService {
     @Value("${razorpay.secret}")
     private String secret;
 
-    @Autowired
-    private AuthenticationUtil authenticationUtil;
 
     public PaymentLink generatePaymentLink(AppUser appUser, int amount, String ref_id) throws RazorpayException {
         RazorpayClient razorpay = new RazorpayClient(key, secret);
@@ -32,7 +30,7 @@ public class PaymentService {
         paymentLinkRequest.put("currency","INR");
         paymentLinkRequest.put("accept_partial",false);
         paymentLinkRequest.put("first_min_partial_amount",amount);
-        paymentLinkRequest.put("expire_by",authenticationUtil.calculateExpirationTime(24*60*150).toInstant().getEpochSecond());
+        paymentLinkRequest.put("expire_by", AuthenticationUtil.calculateExpirationTime(24*60*150).getEpochSecond());
         paymentLinkRequest.put("reference_id",ref_id);
         paymentLinkRequest.put("description","Payment for transaction");
         JSONObject customer = new JSONObject();

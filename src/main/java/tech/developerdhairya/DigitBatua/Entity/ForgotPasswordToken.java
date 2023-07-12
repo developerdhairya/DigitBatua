@@ -4,10 +4,12 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.beans.factory.annotation.Autowired;
 import tech.developerdhairya.DigitBatua.Util.AuthenticationUtil;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -23,7 +25,7 @@ public class ForgotPasswordToken implements Token{
     public ForgotPasswordToken(String token, AppUser appUser) {
         this.token = token;
         this.appUser = appUser;
-        this.expirationTime=util.calculateExpirationTime(EXPIRATION_TIME);
+        this.expirationTime=AuthenticationUtil.calculateExpirationTime(10);
     }
 
     @Id
@@ -32,7 +34,7 @@ public class ForgotPasswordToken implements Token{
 
     private String token;
 
-    private Date expirationTime;
+    private Instant expirationTime;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id",nullable = false)
@@ -40,10 +42,14 @@ public class ForgotPasswordToken implements Token{
     private AppUser appUser;
 
     @CreationTimestamp
-    private Timestamp creationTimestamp = Timestamp.valueOf(LocalDateTime.now());
+    private Timestamp creationTimestamp = Timestamp.from(Instant.now());
 
     @UpdateTimestamp
     private Timestamp updateTimestamp;
 
+    @Override
+    public Instant getExpirationTime() {
+        return this.expirationTime;
+    }
 }
 

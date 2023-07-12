@@ -20,7 +20,7 @@ public class JWTUtil implements Serializable {
 
     public static final long JWT_TOKEN_VALIDITY = 10 * 60 * 60;
 
-    private String secret = "secret";
+    private String secret = "secret"; // For development phase only
 
     //retrieve username from jwt token
     public String getUsernameFromToken(String token) {

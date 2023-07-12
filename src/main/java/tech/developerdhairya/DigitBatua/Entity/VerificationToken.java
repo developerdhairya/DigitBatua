@@ -2,7 +2,6 @@ package tech.developerdhairya.DigitBatua.Entity;
 
 
 import lombok.*;
-import org.hibernate.Hibernate;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -10,9 +9,7 @@ import tech.developerdhairya.DigitBatua.Util.AuthenticationUtil;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.Objects;
+import java.time.Instant;
 
 @Entity
 @Getter
@@ -22,10 +19,11 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @DynamicUpdate
 public class VerificationToken implements Token{
+
     public VerificationToken(String token, AppUser appUser) {
         this.token = token;
         this.appUser = appUser;
-        this.expirationTime=util.calculateExpirationTime(EXPIRATION_TIME);
+        this.expirationTime=AuthenticationUtil.calculateExpirationTime(10);
     }
 
     @Id
@@ -34,7 +32,7 @@ public class VerificationToken implements Token{
 
     private String token;
 
-    private Date expirationTime;
+    private Instant expirationTime;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id",nullable = false)
@@ -42,11 +40,13 @@ public class VerificationToken implements Token{
     private AppUser appUser;
 
     @CreationTimestamp
-    private Timestamp creationTimestamp = Timestamp.valueOf(LocalDateTime.now());
+    private Timestamp creationTimestamp = Timestamp.from(Instant.now());
 
     @UpdateTimestamp
     private Timestamp updateTimestamp;
 
-
-
+    @Override
+    public Instant getExpirationTime() {
+        return this.expirationTime;
+    }
 }

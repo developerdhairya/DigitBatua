@@ -105,13 +105,15 @@ public class TransactionService {
         if (!moneyRequest.get().getStatus().equals(MoneyRequestStatus.Pending.name())) {
             throw new BadRequestException("The request is not in pending state");
         }
-        moneyRequest.get().setStatus(MoneyRequestStatus.Approved.name());
-        moneyRequestRepository.save(moneyRequest.get());
+
         SendMoneyDTO sendMoneyDTO = new SendMoneyDTO();
         sendMoneyDTO.setAmount(moneyRequest.get().getAmount());
         sendMoneyDTO.setReceiverEmailId(moneyRequest.get().getRequesterWallet().getAppUser().getEmailId());
         sendMoneyDTO.setMessage(moneyRequest.get().getMessage());
-        return sendMoney(sendMoneyDTO, TransactionType.RequestTransfer);
+        Wallet response=sendMoney(sendMoneyDTO, TransactionType.RequestTransfer);
+        moneyRequest.get().setStatus(MoneyRequestStatus.Approved.name());
+        moneyRequestRepository.save(moneyRequest.get());
+        return response;
     }
 
 
@@ -165,14 +167,12 @@ public class TransactionService {
         Sort sortCondition = Sort.by("updateTimestamp");
         Sort sortParam = sort == -1 ? sortCondition.descending() : sortCondition.ascending();
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sortParam);
-        System.out.println(pageable);
         List<Transaction> response;
         if (type.equals("All")) {
             response = transactionRepository.getAllByTo_AppUser_EmailId_OrFrom_AppUser_EmailId(emailId,emailId,pageable);
         } else {
             response = transactionRepository.getAllByTo_AppUser_EmailId_OrFrom_AppUser_EmailIdAndType(emailId,emailId,type,pageable);
         }
-        System.out.println(response);
         return TransactionFilteredResponse.filterList(response);
     }
 }
